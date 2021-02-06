@@ -1,10 +1,30 @@
 (ns clojure-service.server
   (:gen-class) ; for -main method in uberjar
   (:require [io.pedestal.http :as server]
+            [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [clojure-service.service :as service]))
 
-(defonce runnable-service (server/create-server service/service))
+(def ^:private service-map {:env :prod
+                            ::http/type :jetty
+                            ::http/host "0.0.0.0"
+                            ::http/port 8080
+                            ::http/resource-path "/public" ;; TODO: check if it is necessary
+                            ::http/container-options {:h2c? true
+                                                      :h2? false
+                                                      :ssl? false}})
+
+(defn- wrap-routes [service-map]
+  (assoc service-map ::http/routes service/routes))
+
+(defn -main
+  [& args]
+  (println "\nCreating your server...")
+  (-> service-map 
+      wrap-routes ; routes need to be first of interceptors, for some reason...
+      server/default-interceptors
+      http/create-server
+      http/start))
 
 (defn run-dev
   "The entry-point for 'lein run-dev'"
@@ -20,29 +40,4 @@
       server/dev-interceptors
       server/create-server
       server/start))
-
-(defn -main
-  "The entry-point for 'lein run'"
-  [& args]
-  (println "\nCreating your server...")
-  (server/start runnable-service))
-
-;; If you package the service up as a WAR,
-;; some form of the following function sections is required (for io.pedestal.servlet.ClojureVarServlet).
-
-;;(defonce servlet  (atom nil))
-;;
-;;(defn servlet-init
-;;  [_ config]
-;;  ;; Initialize your app here.
-;;  (reset! servlet  (server/servlet-init service/service nil)))
-;;
-;;(defn servlet-service
-;;  [_ request response]
-;;  (server/servlet-service @servlet request response))
-;;
-;;(defn servlet-destroy
-;;  [_]
-;;  (server/servlet-destroy @servlet)
-;;  (reset! servlet nil))
 

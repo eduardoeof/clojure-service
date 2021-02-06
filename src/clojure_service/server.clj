@@ -26,18 +26,3 @@
       http/create-server
       http/start))
 
-(defn run-dev
-  "The entry-point for 'lein run-dev'"
-  [& args]
-  (println "\nCreating your [DEV] server...")
-  (-> service/service 
-      (merge {:env :dev
-              ::server/join? false
-              ::server/routes #(route/expand-routes (deref #'service/routes))
-              ::server/allowed-origins {:creds true :allowed-origins (constantly true)}
-              ::server/secure-headers {:content-security-policy-settings {:object-src "'none'"}}})
-      server/default-interceptors
-      server/dev-interceptors
-      server/create-server
-      server/start))
-

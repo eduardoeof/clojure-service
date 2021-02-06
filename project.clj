@@ -1,10 +1,7 @@
 (defproject clojure-service "0.0.1-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "A simple clojure service"
 
-  :url "http://example.com/FIXME"
-
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :url "https://github.com/eduardoeof/clojure-service"
 
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [io.pedestal/pedestal.service "0.5.8"]
@@ -14,12 +11,12 @@
                  [org.slf4j/jcl-over-slf4j "1.7.26"]
                  [org.slf4j/log4j-over-slf4j "1.7.26"]]
 
-  :min-lein-version "2.0.0"
-
-  :resource-paths ["config", "resources"]
-
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]]}
              :uberjar {:aot [clojure-service.server]}}
 
+  :resource-paths ["config", "resources"]
+
   :main ^{:skip-aot true} clojure-service.server)
+
+  :min-lein-version "2.0.0"

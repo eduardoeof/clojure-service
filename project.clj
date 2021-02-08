@@ -12,7 +12,8 @@
                  [org.slf4j/log4j-over-slf4j "1.7.26"]]
 
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]}
-                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]]}
+                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]
+                                  [nubank/matcher-combinators "3.1.4"]]}
              :uberjar {:aot [clojure-service.server]}}
 
   :resource-paths ["config", "resources"]

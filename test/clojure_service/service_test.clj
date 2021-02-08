@@ -2,38 +2,14 @@
   (:require [clojure.test :refer :all]
             [io.pedestal.test :refer :all]
             [io.pedestal.http :as bootstrap]
-            [clojure-service.service :as service]))
+            [matcher-combinators.test :refer [match?]]
+            [clojure-service.server :as server]))
 
 (def service
-  (::bootstrap/service-fn (bootstrap/create-servlet service/service)))
+  (::bootstrap/service-fn (bootstrap/create-servlet (server/build-service-map))))
 
-(deftest home-page-test
-  (is (=
-       (:body (response-for service :get "/"))
-       "Hello World!"))
-  (is (=
-       (:headers (response-for service :get "/"))
-       {"Content-Type" "text/html;charset=UTF-8"
-        "Strict-Transport-Security" "max-age=31536000; includeSubdomains"
-        "X-Frame-Options" "DENY"
-        "X-Content-Type-Options" "nosniff"
-        "X-XSS-Protection" "1; mode=block"
-        "X-Download-Options" "noopen"
-        "X-Permitted-Cross-Domain-Policies" "none"
-        "Content-Security-Policy" "object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;"})))
-
-(deftest about-page-test
-  (is (.contains
-       (:body (response-for service :get "/about"))
-       "Clojure 1.9"))
-  (is (=
-       (:headers (response-for service :get "/about"))
-       {"Content-Type" "text/html;charset=UTF-8"
-        "Strict-Transport-Security" "max-age=31536000; includeSubdomains"
-        "X-Frame-Options" "DENY"
-        "X-Content-Type-Options" "nosniff"
-        "X-XSS-Protection" "1; mode=block"
-        "X-Download-Options" "noopen"
-        "X-Permitted-Cross-Domain-Policies" "none"
-        "Content-Security-Policy" "object-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https: http:;"})))
-
+(deftest health-test
+  (let [response (response-for service :get "/api/health")]
+    (is (match? {:status 200
+                 :body "{\"message\":\"I have a dream - Martin Luther King, Jr.\"}"}
+                response))))

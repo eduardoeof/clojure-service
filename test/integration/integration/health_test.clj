@@ -1,4 +1,4 @@
-(ns clojure-service.service-test
+(ns integration.health-test 
   (:require [clojure.test :refer :all]
             [io.pedestal.test :refer :all]
             [io.pedestal.http :as bootstrap]

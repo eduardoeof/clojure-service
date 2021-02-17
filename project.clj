@@ -14,10 +14,17 @@
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]
                                   [nubank/matcher-combinators "3.1.4"]]}
+
+             :integration {:test-paths ^:replace ["test/integration"]}
+
              :uberjar {:aot [clojure-service.server]}}
+
+  :aliases {"integration" ["with-profile" "+integration" "test"]}
+
+  :test-paths ["test/integration"]
 
   :resource-paths ["config", "resources"]
 
-  :main ^{:skip-aot true} clojure-service.server)
+  :main ^{:skip-aot true} clojure-service.server
 
-  :min-lein-version "2.0.0"
+  :min-lein-version "2.0.0")

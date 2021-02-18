@@ -13,7 +13,8 @@
 
   :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]
-                                  [nubank/matcher-combinators "3.1.4"]]}
+                                  [nubank/matcher-combinators "3.1.4"]
+                                  [org.clojure/data.json "1.0.0"]]}
 
              :integration {:test-paths ^:replace ["test/integration"]}
 

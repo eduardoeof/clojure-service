@@ -31,5 +31,13 @@
                                   ::slug
                                   ::quote]))
 
+(s/def ::id string?)
+(s/def ::created-at string?)
+(s/def ::response (s/keys :req-un [::id
+                                   ::created-at
+                                   ::type
+                                   ::slug
+                                   ::quote]))
+
 ;; TODO: schema.cryptocurrency/dto
 ;; TODO: schema.cryptocurrency/model

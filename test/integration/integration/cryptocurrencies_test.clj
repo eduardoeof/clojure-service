@@ -21,7 +21,7 @@
                                  :last-updated "2018-08-09T22:53:32.000Z"}}})
 
 (def response-body {:id "3edf8b2a-6962-11eb-9439-0242ac130002" 
-                    :last-updated "2018-06-02T22:51:28.209Z" 
+                    :created-at "2018-06-02T22:51:28.209Z" 
                     :name "Bitcoin"
                     :type "BTC"
                     :slug "bitcoin"

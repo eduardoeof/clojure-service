@@ -17,13 +17,15 @@
                                   [nubank/matcher-combinators "3.1.4"]
                                   [org.clojure/data.json "1.0.0"]]}
 
+             :unit {:test-paths ^:replace ["test/unit"]}
              :integration {:test-paths ^:replace ["test/integration"]}
 
              :uberjar {:aot [clojure-service.server]}}
 
-  :aliases {"integration" ["with-profile" "+integration" "test"]}
+  :aliases {"integration" ["with-profile" "+integration" "test"]
+            "unit"        ["with-profile" "+unit" "test"]}
 
-  :test-paths ["test/integration"]
+  :test-paths ["test/integration" "test/unit"]
 
   :resource-paths ["config", "resources"]
 

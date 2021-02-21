@@ -34,7 +34,7 @@
                                     {:exception-type ::bad-response-exception})))
                   context)))}))
 
-(def error-handler-interceptor
+(def ^:private error-handler-interceptor
   (interceptor.error/error-dispatch [context ex]
     [{:exception-type ::bad-request-exception}]
     (assoc context :response {:body {:error "Request not valid"}

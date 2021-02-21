@@ -1,7 +1,7 @@
 (ns clojure-service.server
   (:gen-class) ; for -main method in uberjar
   (:require [io.pedestal.http :as http]
-            [io.pedestal.http.body-params :as http.body-params]
+            [clojure-service.interceptor :as interceptor]
             [clojure-service.service :as service]))
 
 (def service-map {:env :prod
@@ -16,16 +16,10 @@
 (defn- wrap-routes [service-map]
   (assoc service-map ::http/routes service/routes))
 
-(defn- wrap-interceptors [service-map]
-  (-> service-map
-      http/default-interceptors
-      (update ::http/interceptors conj (http.body-params/body-params))
-      (update ::http/interceptors conj http/json-body)))
-
 (defn build-service-map []
   (-> service-map
       wrap-routes
-      wrap-interceptors))
+      interceptor/wrap-interceptors))
 
 (defn -main
   [& args]

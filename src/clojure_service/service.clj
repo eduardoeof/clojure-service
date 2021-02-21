@@ -1,7 +1,6 @@
 (ns clojure-service.service
-  (:require [io.pedestal.http :as http]
-            [io.pedestal.http.route :as route]
-            [io.pedestal.http.body-params :as body-params]))
+  (:require [clojure-service.interceptor :as interceptor]
+            [clojure-service.schema.cryptocurrency :as schema.cryptocurrency]))
 
 (defn- create-cryptocurrency 
   [{:keys [json-params] :as _request}]
@@ -16,4 +15,5 @@
    :body {:message "I have a dream - Martin Luther King, Jr."}})
 
 (def routes #{["/api/health"           :get  `health-check]
-              ["/api/cryptocurrencies" :post `create-cryptocurrency]})
+              ["/api/cryptocurrencies" :post [(interceptor/bad-request-interceptor ::schema.cryptocurrency/request)  
+                                             `create-cryptocurrency]]})

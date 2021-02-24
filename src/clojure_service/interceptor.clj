@@ -35,17 +35,18 @@
                   context)))}))
 
 (def ^:private error-handler-interceptor
-  (interceptor.error/error-dispatch [context ex]
-    [{:exception-type ::bad-request-exception}]
-    (assoc context :response {:body {:error "Request not valid"}
-                              :status 400})
+  (-> (interceptor.error/error-dispatch 
+        [context ex]
+        [{:exception-type ::bad-request-exception}]
+        (assoc context :response {:body {:error "Request not valid"}
+                                  :status 400})
 
-    [{:exception-type ::bad-response-exception}]
-    (assoc context :response {:body {:error "Response not valid"}
-                              :status 500})
-    :else
-    (assoc context :io.pedestal.interceptor.chain/error ex)))
-  
+        [{:exception-type ::bad-response-exception}]
+        (assoc context :response {:body {:error "Response not valid"}
+                                  :status 500})
+        :else
+        (assoc context :io.pedestal.interceptor.chain/error ex))
+      (assoc :name ::error-handler-interceptor)))
 
 (defn wrap-interceptors [service-map]
   (-> service-map
@@ -53,4 +54,3 @@
       (update ::http/interceptors conj (http.body-params/body-params))
       (update ::http/interceptors conj http/json-body)
       (update ::http/interceptors conj error-handler-interceptor)))
-

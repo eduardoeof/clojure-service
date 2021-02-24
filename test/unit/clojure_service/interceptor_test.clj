@@ -16,19 +16,19 @@
                                                  :y 1}}}})
 
 (deftest bad-request-interceptor-test
-  (testing "Create bad request interceptor"
+  (testing "should create bad request interceptor"
     (is (match? {:name :clojure-service.interceptor/bad-request-interceptor
                  :enter function?
                  :leave nil}
                 (interceptor/bad-request-interceptor ::body))))
 
-  (testing "Interceptor doesn't thrown an exception when input matches the schema"
+  (testing "should not throw an exception when a request matches the schema"
     (let [interceptor (interceptor/bad-request-interceptor ::body)
           func (:enter interceptor)]
       (is (match? context-request
                   (func context-request)))))
 
-  (testing "Interceptor throws an exception when input doesn't match the schema"
+  (testing "Interceptor throws an exception when a request doesn't match the schema"
     (let [interceptor (interceptor/bad-request-interceptor ::body)
           func (:enter interceptor)
           wrong-context (assoc-in context-request [:request :json-params :point :x] "wrong value")]
@@ -42,13 +42,13 @@
                  :leave function?}
                 (interceptor/bad-response-interceptor ::body))))
 
-  (testing "should not throw an exception when input matches the schema"
+  (testing "should not throw an exception when a response matches the schema"
     (let [interceptor (interceptor/bad-response-interceptor ::body)
           func (:leave interceptor)]
       (is (match? context-response
                   (func context-response)))))
 
-  (testing "should throw an exception when input doesn't match the schema"
+  (testing "should throw an exception when a response doesn't match the schema"
     (let [interceptor (interceptor/bad-response-interceptor ::body)
           func (:leave interceptor)
           wrong-context (assoc-in context-response [:response :body :point :x] "wrong value")]

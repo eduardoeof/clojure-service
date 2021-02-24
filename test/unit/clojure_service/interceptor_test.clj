@@ -61,7 +61,7 @@
 
 (deftest wrap-interceptors-test
   (let [system-map (interceptor/wrap-interceptors system-map)]
-    (testing "system-map should have 11 interceptors in system-map"
+    (testing "system-map should have 11 interceptors"
       (is (match? 11
                   (-> system-map
                       :io.pedestal.http/interceptors

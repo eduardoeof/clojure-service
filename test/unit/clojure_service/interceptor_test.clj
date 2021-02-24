@@ -15,6 +15,10 @@
 (def context-response {:response {:body {:point {:x 1
                                                  :y 1}}}})
 
+(defn- route-handler [] (+ 1 1))
+
+(def system-map {:io.pedestal.http/routes #{["/route" :get `route-handler]}})
+
 (deftest bad-request-interceptor-test
   (testing "should create bad request interceptor"
     (is (match? {:name :clojure-service.interceptor/bad-request-interceptor
@@ -54,3 +58,23 @@
           wrong-context (assoc-in context-response [:response :body :point :x] "wrong value")]
       (is (thrown-match? {:exception-type :clojure-service.interceptor/bad-response-exception}
                          (func wrong-context))))))
+
+(deftest wrap-interceptors-test
+  (let [system-map (interceptor/wrap-interceptors system-map)]
+    (testing "system-map should have 11 interceptors in system-map"
+      (is (match? 11
+                  (-> system-map
+                      :io.pedestal.http/interceptors
+                      count))))
+
+    (testing "system-map should contain json-body interceptor"
+      (is (some? (filter #((= :io.pedestal.http/json-body (:name %)))
+                         (:io.pedestal.http/interceptors system-map))))))
+      
+    (testing "system-map should contain body-params interceptor"
+      (is (some? (filter #((= :io.pedestal.http/body-params (:name %)))
+                         (:io.pedestal.http/interceptors system-map))))) 
+    
+    (testing "system-map should contain error-handler interceptor"
+      (is (some? (filter #((= :clojure-service.interceptor/error-handler-interceptor (:name %)))
+                         (:io.pedestal.http/interceptors system-map))))))

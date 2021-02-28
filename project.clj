@@ -12,10 +12,11 @@
                  [org.slf4j/log4j-over-slf4j "1.7.26"]
                  [clj-time "0.15.2"]]
 
-  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]}
-                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]
+  :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]
                                   [nubank/matcher-combinators "3.1.4"]
-                                  [org.clojure/data.json "1.0.0"]]}
+                                  [org.clojure/data.json "1.0.0"]]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]]
+                   :aliases {"run-dev" ["trampoline" "run" "-m" "clojure-service.server/run-dev"]} }
 
              :unit {:test-paths ^:replace ["test/unit"]}
              :integration {:test-paths ^:replace ["test/integration"]}

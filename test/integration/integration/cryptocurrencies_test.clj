@@ -3,7 +3,8 @@
             [io.pedestal.test :refer :all]
             [matcher-combinators.test :refer [match?]]
             [clojure.data.json :as json] 
-            [integration.helper :as helper]))
+            [integration.helper :as helper]
+            [clojure-service.controller :as controller]))
 
 (def request-body {:name "Bitcoin"
                    :type "BTC"
@@ -55,5 +56,16 @@
                                  :body (json/write-str body))]
       (is (match? {:status 400
                    :body (json/write-str {:error "Request not valid"})}
-                  response)))))
+                  response))))
+  
+  (testing "it should respond internal server error because response doesn't match the expected schema"
+    (binding [controller/create-cryptocurrency (fn [_] {})]
+      (let [response (response-for (helper/create-service) 
+                                   :post "/api/cryptocurrencies"
+                                   :headers {"Content-Type" "application/json"}  
+                                   :body (json/write-str request-body))]
+
+        (is (match? {:status 500
+                     :body (json/write-str {:error "Response not valid"})}
+                    response))))))
 

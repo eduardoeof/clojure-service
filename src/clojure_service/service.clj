@@ -1,13 +1,12 @@
 (ns clojure-service.service
   (:require [clojure-service.interceptor :as interceptor]
-            [clojure-service.schema.cryptocurrency :as schema.cryptocurrency]))
+            [clojure-service.schema.cryptocurrency :as schema.cryptocurrency]
+            [clojure-service.controller :as controller]))
 
 (defn- create-cryptocurrency 
   [{:keys [json-params] :as _request}]
   {:status 201
-   :body (merge {:id "3edf8b2a-6962-11eb-9439-0242ac130002"
-                 :created-at "2018-06-02T22:51:28.209Z"}
-                json-params)})
+   :body (controller/create-cryptocurrency json-params)})
 
 (defn- health-check 
   [_request]

@@ -1,12 +1,16 @@
 (ns clojure-service.service
   (:require [clojure-service.interceptor :as interceptor]
             [clojure-service.schema.cryptocurrency :as schema.cryptocurrency]
-            [clojure-service.controller :as controller]))
+            [clojure-service.controller :as controller]
+            [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (defn- create-cryptocurrency 
   [{:keys [json-params] :as _request}]
-  {:status 201
-   :body (controller/create-cryptocurrency json-params)})
+  (let [body (-> json-params
+                 ;adapter/request-body->model
+                 controller/create-cryptocurrency)]
+    {:status 201
+     :body body}))
 
 (defn- health-check 
   [_request]

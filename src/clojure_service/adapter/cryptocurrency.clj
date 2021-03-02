@@ -1,4 +1,4 @@
-(ns clojure-service.adapter.cryptucurrency
+(ns clojure-service.adapter.cryptocurrency
   (:require [clj-time.coerce :as time]))
 
 (defn request-body->model [body]

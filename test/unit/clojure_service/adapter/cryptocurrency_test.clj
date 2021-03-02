@@ -1,8 +1,8 @@
-(ns clojure-service.adapter.cryptucurrency-test
+(ns clojure-service.adapter.cryptocurrency-test
   (:require [clojure.test :refer :all]
             [matcher-combinators.test :refer [match?]]
             [clj-time.coerce :as time]
-            [clojure-service.adapter.cryptucurrency :as adapter]))
+            [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (def last-updated "2018-08-09T22:53:32.000Z")
 

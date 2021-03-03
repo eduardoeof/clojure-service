@@ -1,7 +1,8 @@
 (ns clojure-service.adapter.cryptocurrency-test
   (:require [clojure.test :refer :all]
             [matcher-combinators.test :refer [match?]]
-            [clj-time.coerce :as time]
+            [clj-time.core :as time.core]
+            [clj-time.coerce :as time.coerce]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (def last-updated "2018-08-09T22:53:32.000Z")
@@ -21,7 +22,20 @@
                                  :percent-change-7d 0.0
                                  :last-updated last-updated}}})
 
+(def model (-> request-body
+               (assoc :id (java.util.UUID/randomUUID))  
+               (assoc :created-at (time.core/now))
+               (assoc-in [:quote :USD :last-updated] (time.coerce/from-string last-updated))
+               (assoc-in [:quote :BTC :last-updated] (time.coerce/from-string last-updated))))
+
 (deftest request-body->model-test
-  (is (match? {:quote {:USD {:last-updated (time/from-string last-updated)}
-                       :BTC {:last-updated (time/from-string last-updated)}}}
+  (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
+                       :BTC {:last-updated (time.coerce/from-string last-updated)}}}
               (adapter/request-body->model request-body))))
+
+(deftest model->response-body-test
+  (is (match? {:id string? 
+               :created-at string? 
+               :quote {:USD {:last-updated last-updated}
+                       :BTC {:last-updated last-updated}}}
+              (adapter/model->response-body model))))

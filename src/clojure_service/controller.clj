@@ -1,6 +1,12 @@
-(ns clojure-service.controller)
+(ns clojure-service.controller
+  (:require [clj-time.core :as time.core]
+            [clj-time.coerce :as time.coerce]))
 
 (defn ^:dynamic create-cryptocurrency [dto]
-  (merge {:id "3edf8b2a-6962-11eb-9439-0242ac130002"
-          :created-at "2018-06-02T22:51:28.209Z"}
-         dto))
+  (let [usd-last-updated (-> dto :quote :USD :last-updated) 
+        btc-last-updated (-> dto :quote :BTC :last-updated)]
+    (-> dto
+        (assoc :id (java.util.UUID/randomUUID))
+        (assoc :created-at (time.core/now))
+        (assoc-in [:quote :USD :last-updated] usd-last-updated)
+        (assoc-in [:quote :BTC :last-updated] btc-last-updated))))

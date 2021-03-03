@@ -1,7 +1,5 @@
 (ns clojure-service.schema.cryptocurrency
-  (:require [clojure.spec.alpha :as s]
-            ;[clj-time.types :refer [date-time?]]
-            ))
+  (:require [clojure.spec.alpha :as s]))
 
 (s/def ::name string?)
 (s/def ::type string?)
@@ -35,9 +33,9 @@
 (s/def ::created-at string?)
 (s/def ::response (s/keys :req-un [::id
                                    ::created-at
+                                   ::name
                                    ::type
                                    ::slug
                                    ::quote]))
 
-;; TODO: schema.cryptocurrency/dto
 ;; TODO: schema.cryptocurrency/model

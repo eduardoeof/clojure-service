@@ -15,28 +15,15 @@
                                   :percent-change-7d 0.986573
                                   :last-updated "2018-08-09T22:53:32.000Z"}
                            :BTC {:price 1.0 
-                                 :volume-24h 772012
                                  :percent-change-1h 0.0 
                                  :percent-change-24h 0.0
                                  :percent-change-7d 0.0
-                                 :last-updated "2018-08-09T22:53:32.000Z"}}})
+                                 :last-updated "2018-08-09T22:53:32.000Z"
+                                 :volume-24h 772012}}})
 
-(def response-body {:id "3edf8b2a-6962-11eb-9439-0242ac130002" 
-                    :created-at "2018-06-02T22:51:28.209Z" 
-                    :name "Bitcoin"
-                    :type "BTC"
-                    :slug "bitcoin"
-                    :quote {:USD {:price 9283.92
-                                   :percent-change-1h -0.152774
-                                   :percent-change-24h 0.518894
-                                   :percent-change-7d 0.986573
-                                   :last-updated "2018-08-09T22:53:32.000Z"}
-                            :BTC {:price 1.0 
-                                  :volume-24h 772012
-                                  :percent-change-1h 0.0 
-                                  :percent-change-24h 0.0
-                                  :percent-change-7d 0.0
-                                  :last-updated "2018-08-09T22:53:32.000Z"}}})
+(def response-body (merge {:id string?
+                           :created-at string?}
+                          request-body))
 
 (deftest cryptocurrencies-test
   (testing "Create a cryptocurrency with success"
@@ -44,9 +31,11 @@
                                  :post "/api/cryptocurrencies"
                                  :headers {"Content-Type" "application/json"}  
                                  :body (json/write-str request-body))]
-      (is (match? {:status 201
-                   :body (json/write-str response-body)}
-                  response))))
+      (is (match? 201
+                  (:status response)))  
+      (is (match? response-body 
+                  (json/read-str (:body response)
+                                 :key-fn keyword)))))
   
   (testing "Bad request error when tried to create a cryptocurrency"
     (let [body (dissoc request-body :name)

@@ -31,11 +31,11 @@
 (deftest request-body->model-test
   (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
                        :BTC {:last-updated (time.coerce/from-string last-updated)}}}
-              (adapter/request-body->model request-body))))
+              (adapter/request-body->cryptocurrency request-body))))
 
 (deftest model->response-body-test
   (is (match? {:id string? 
                :created-at string? 
                :quote {:USD {:last-updated last-updated}
                        :BTC {:last-updated last-updated}}}
-              (adapter/model->response-body model))))
+              (adapter/cryptocurrency->response-body model))))

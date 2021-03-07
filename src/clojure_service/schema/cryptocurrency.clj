@@ -1,5 +1,6 @@
 (ns clojure-service.schema.cryptocurrency
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure-service.schema.cryptocurrency.model :as model]))
 
 (s/def ::name string?)
 (s/def ::type string?)
@@ -25,17 +26,22 @@
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
 (s/def ::request-body (s/keys :req-un [::name
-                                  ::type
-                                  ::slug
-                                  ::quote]))
+                                       ::type
+                                       ::slug
+                                       ::quote]))
 
 (s/def ::id string?)
 (s/def ::created-at string?)
 (s/def ::response-body (s/keys :req-un [::id
-                                   ::created-at
-                                   ::name
-                                   ::type
-                                   ::slug
-                                   ::quote]))
+                                        ::created-at
+                                        ::name
+                                        ::type
+                                        ::slug
+                                        ::quote]))
+
+(s/def ::dto (s/keys :req-un [::name
+                              ::type
+                              ::slug
+                              ::model/quote]))
 
 ;; TODO: schema.cryptocurrency/model

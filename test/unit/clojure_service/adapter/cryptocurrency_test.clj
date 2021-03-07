@@ -1,6 +1,6 @@
 (ns clojure-service.adapter.cryptocurrency-test
   (:require [clojure.test :refer :all]
-            [matcher-combinators.test :refer [match?]]
+            [matcher-combinators.test :refer [match? thrown-match?]]
             [clj-time.core :as time.core]
             [clj-time.coerce :as time.coerce]
             [clojure-service.adapter.cryptocurrency :as adapter]))
@@ -29,13 +29,27 @@
                         (assoc-in [:quote :BTC :last-updated] (time.coerce/from-string last-updated))))
 
 (deftest request-body->dto-test
-  (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
-                       :BTC {:last-updated (time.coerce/from-string last-updated)}}}
-              (adapter/request-body->dto request-body))))
+  (testing "it should adapt a request body to a dto"
+    (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
+                         :BTC {:last-updated (time.coerce/from-string last-updated)}}}
+                (adapter/request-body->dto request-body))))
+  
+  (testing "it should thrown an exception when passed a non request body"
+    (let [fake-request-body {:x 1}]
+      (is (thrown-with-msg? java.lang.AssertionError
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
+                            (adapter/request-body->dto fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test
-  (is (match? {:id string? 
-               :created-at string? 
-               :quote {:USD {:last-updated last-updated}
-                       :BTC {:last-updated last-updated}}}
-              (adapter/cryptocurrency->response-body cryptocurrency))))
+  (testing "it should adapt a cryptocurrency in a response body"
+    (is (match? {:id string? 
+                 :created-at string? 
+                 :quote {:USD {:last-updated last-updated}
+                         :BTC {:last-updated last-updated}}}
+                (adapter/cryptocurrency->response-body cryptocurrency))))
+  
+  (testing "it should thrown an exception when passed a non response body"
+    (let [fake-response-body {:y 1}]
+      (is (thrown-with-msg? java.lang.AssertionError
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency cryptocurrency\)"
+                            (adapter/cryptocurrency->response-body fake-response-body))))))

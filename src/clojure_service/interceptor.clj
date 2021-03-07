@@ -38,14 +38,15 @@
   (-> (interceptor.error/error-dispatch 
         [context ex]
         [{:exception-type ::bad-request-exception}]
-        (assoc context :response {:body {:error "Request not valid"}
-                                  :status 400})
+        (assoc context :response {:status 400
+                                  :body {:message "Request not valid"}})
 
         [{:exception-type ::bad-response-exception}]
-        (assoc context :response {:body {:error "Response not valid"}
-                                  :status 500})
+        (assoc context :response {:status 500
+                                  :body {:message "Response not valid"}})
         :else
-        (assoc context :io.pedestal.interceptor.chain/error ex))
+        (assoc context :response {:status 500
+                                  :body {:message "Internal server error"}}))
       (assoc :name ::error-handler-interceptor)))
 
 (defn wrap-interceptors [service-map]

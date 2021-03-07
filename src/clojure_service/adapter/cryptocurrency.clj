@@ -13,6 +13,8 @@
         (assoc-in [:quote :BTC :last-updated] (time/from-string btc-last-updated)))))
 
 (defn cryptocurrency->response-body [cryptocurrency]
+  {:pre  [(s/valid? ::schema/cryptocurrency cryptocurrency)]
+   :post [(s/valid? ::schema/response-body %)]}
   (let [id (:id cryptocurrency)
         created-at (:created-at cryptocurrency)
         usd-last-updated (-> cryptocurrency :quote :USD :last-updated)

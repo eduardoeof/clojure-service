@@ -1,7 +1,11 @@
 (ns clojure-service.adapter.cryptocurrency
-  (:require [clj-time.coerce :as time]))
+  (:require [clj-time.coerce :as time]
+            [clojure.spec.alpha :as s]
+            [clojure-service.schema.cryptocurrency :as schema]))
 
-(defn request-body->cryptocurrency [body]
+(defn request-body->dto [body]
+  {:pre  [(s/valid? ::schema/request-body body)]
+   :post [(s/valid? ::schema/dto %)]}
   (let [usd-last-updated (-> body :quote :USD :last-updated)
         btc-last-updated (-> body :quote :BTC :last-updated)]
     (-> body

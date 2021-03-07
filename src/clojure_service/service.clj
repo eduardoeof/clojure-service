@@ -7,7 +7,7 @@
 (defn- create-cryptocurrency 
   [{:keys [json-params] :as _request}]
   (let [body (-> json-params
-                 adapter/request-body->cryptocurrency
+                 adapter/request-body->dto
                  controller/create-cryptocurrency
                  adapter/cryptocurrency->response-body)]
     {:status 201

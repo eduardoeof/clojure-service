@@ -22,20 +22,20 @@
                                  :percent-change-7d 0.0
                                  :last-updated last-updated}}})
 
-(def model (-> request-body
-               (assoc :id (java.util.UUID/randomUUID))  
-               (assoc :created-at (time.core/now))
-               (assoc-in [:quote :USD :last-updated] (time.coerce/from-string last-updated))
-               (assoc-in [:quote :BTC :last-updated] (time.coerce/from-string last-updated))))
+(def cryptocurrency (-> request-body
+                        (assoc :id (java.util.UUID/randomUUID))  
+                        (assoc :created-at (time.core/now))
+                        (assoc-in [:quote :USD :last-updated] (time.coerce/from-string last-updated))
+                        (assoc-in [:quote :BTC :last-updated] (time.coerce/from-string last-updated))))
 
-(deftest request-body->model-test
+(deftest request-body->dto-test
   (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
                        :BTC {:last-updated (time.coerce/from-string last-updated)}}}
-              (adapter/request-body->cryptocurrency request-body))))
+              (adapter/request-body->dto request-body))))
 
-(deftest model->response-body-test
+(deftest cryptocurrency->response-body-test
   (is (match? {:id string? 
                :created-at string? 
                :quote {:USD {:last-updated last-updated}
                        :BTC {:last-updated last-updated}}}
-              (adapter/cryptocurrency->response-body model))))
+              (adapter/cryptocurrency->response-body cryptocurrency))))

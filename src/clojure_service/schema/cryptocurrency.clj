@@ -24,14 +24,14 @@
                               ::volume-24h]))
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
-(s/def ::request (s/keys :req-un [::name
+(s/def ::request-body (s/keys :req-un [::name
                                   ::type
                                   ::slug
                                   ::quote]))
 
 (s/def ::id string?)
 (s/def ::created-at string?)
-(s/def ::response (s/keys :req-un [::id
+(s/def ::response-body (s/keys :req-un [::id
                                    ::created-at
                                    ::name
                                    ::type

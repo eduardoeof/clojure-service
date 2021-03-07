@@ -19,6 +19,6 @@
    :body {:message "I have a dream - Martin Luther King, Jr."}})
 
 (def routes #{["/api/health"           :get  `health-check]
-              ["/api/cryptocurrencies" :post [(interceptor/bad-request-interceptor ::schema.cryptocurrency/request)
-                                              (interceptor/bad-response-interceptor ::schema.cryptocurrency/response)
+              ["/api/cryptocurrencies" :post [(interceptor/bad-request-interceptor ::schema.cryptocurrency/request-body)
+                                              (interceptor/bad-response-interceptor ::schema.cryptocurrency/response-body)
                                               `create-cryptocurrency]]})

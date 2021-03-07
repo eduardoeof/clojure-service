@@ -47,7 +47,7 @@
                    :body (json/write-str {:message "Request not valid"})}
                   response))))
   
-  (testing "it should respond internal server error because response doesn't match the expected schema"
+  (testing "it should responde internal server error because response doesn't match the expected schema"
     (binding [controller/create-cryptocurrency (fn [_] {})]
       (let [response (response-for (helper/create-service) 
                                    :post "/api/cryptocurrencies"

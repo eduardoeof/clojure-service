@@ -20,7 +20,6 @@
                         :percent-change-7d 0.0
                         :last-updated (time.core/now)}}})
 
-
 (def cryptocurrency (merge dto 
                            {:id uuid?
                             :created-at time.types/date-time?}))

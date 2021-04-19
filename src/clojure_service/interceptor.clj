@@ -6,6 +6,30 @@
             [io.pedestal.interceptor.error :as interceptor.error]
             [io.pedestal.http.body-params :as http.body-params]))
 
+(defn ^:private log-and-response [status message exception]
+  (log/error :message message
+             :exception exception)
+  {:status status
+   :body {:message message}})
+
+(def ^:private error-handler-interceptor
+  (-> (interceptor.error/error-dispatch 
+        [context exception]
+        [{:exception-type ::bad-request-exception}]
+        (assoc context :response (log-and-response 400
+                                                   "Request not valid"
+                                                   exception))
+
+        [{:exception-type ::bad-response-exception}]
+        (assoc context :response (log-and-response 500
+                                                   "Response not valid"
+                                                   exception))
+        :else
+        (assoc context :response (log-and-response 500
+                                                   "Internal server error"
+                                                   exception)))
+      (assoc :name ::error-handler-interceptor)))
+
 (defn bad-request-interceptor [body-schema]
   (i/interceptor
     {:name ::bad-request-interceptor
@@ -33,21 +57,6 @@
                     (throw (ex-info "Body response doesn't match with expected schema"
                                     {:exception-type ::bad-response-exception})))
                   context)))}))
-
-(def ^:private error-handler-interceptor
-  (-> (interceptor.error/error-dispatch 
-        [context ex]
-        [{:exception-type ::bad-request-exception}]
-        (assoc context :response {:status 400
-                                  :body {:message "Request not valid"}})
-
-        [{:exception-type ::bad-response-exception}]
-        (assoc context :response {:status 500
-                                  :body {:message "Response not valid"}})
-        :else
-        (assoc context :response {:status 500
-                                  :body {:message "Internal server error"}}))
-      (assoc :name ::error-handler-interceptor)))
 
 (defn wrap-interceptors [service-map]
   (-> service-map

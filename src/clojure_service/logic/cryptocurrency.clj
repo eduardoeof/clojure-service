@@ -1,8 +1,8 @@
 (ns clojure-service.logic.cryptocurrency
-  (:require [clj-time.core :as time.core]))
+  (:require [java-time :as time]))
 
 (defn create-cryptocurrency [dto]
   (-> dto 
       (assoc :id (java.util.UUID/randomUUID))
-      (assoc :created-at (time.core/now))))
+      (assoc :created-at (time/local-date-time))))
 

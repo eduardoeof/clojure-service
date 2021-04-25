@@ -10,15 +10,15 @@
                    :type "BTC"
                    :slug "bitcoin"
                    :quote {:USD {:price 9283.92
-                                  :percent-change-1h -0.152774
-                                  :percent-change-24h 0.518894
-                                  :percent-change-7d 0.986573
-                                  :last-updated "2018-08-09T22:53:32.000Z"}
+                                 :percent-change-1h -0.152774
+                                 :percent-change-24h 0.518894
+                                 :percent-change-7d 0.986573
+                                 :last-updated "2018-08-09T22:53:32.000"}
                            :BTC {:price 1.0 
                                  :percent-change-1h 0.0 
                                  :percent-change-24h 0.0
                                  :percent-change-7d 0.0
-                                 :last-updated "2018-08-09T22:53:32.000Z"
+                                 :last-updated "2018-08-09T22:53:32.000"
                                  :volume-24h 772012}}})
 
 (def response-body (merge {:id string?

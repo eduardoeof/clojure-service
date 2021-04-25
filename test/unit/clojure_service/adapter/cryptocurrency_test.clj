@@ -1,11 +1,11 @@
 (ns clojure-service.adapter.cryptocurrency-test
   (:require [clojure.test :refer :all]
-            [matcher-combinators.test :refer [match? thrown-match?]]
-            [clj-time.core :as time.core]
-            [clj-time.coerce :as time.coerce]
+            [matcher-combinators.test :refer [match?]]
+            [java-time :as time]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
-(def last-updated "2018-08-09T22:53:32.000Z")
+(def last-updated "2018-08-09T22:53:32.000")
+(def last-update-date-time (time/local-date-time last-updated))
 
 (def request-body {:name "Bitcoin"
                    :type "BTC"
@@ -24,14 +24,16 @@
 
 (def cryptocurrency (-> request-body
                         (assoc :id (java.util.UUID/randomUUID))  
-                        (assoc :created-at (time.core/now))
-                        (assoc-in [:quote :USD :last-updated] (time.coerce/from-string last-updated))
-                        (assoc-in [:quote :BTC :last-updated] (time.coerce/from-string last-updated))))
+                        (assoc :created-at (time/local-date-time))
+                        (assoc-in [:quote :USD :last-updated] last-update-date-time)
+                        (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
+
+(def mongodb-document (assoc cryptocurrency :_id (java.util.UUID/randomUUID)))
 
 (deftest request-body->dto-test
   (testing "it should adapt a request body to a dto"
-    (is (match? {:quote {:USD {:last-updated (time.coerce/from-string last-updated)}
-                         :BTC {:last-updated (time.coerce/from-string last-updated)}}}
+    (is (match? {:quote {:USD {:last-updated last-update-date-time}
+                         :BTC {:last-updated last-update-date-time}}}
                 (adapter/request-body->dto request-body))))
   
   (testing "it should thrown an exception when passed a non request body"
@@ -53,3 +55,8 @@
       (is (thrown-with-msg? java.lang.AssertionError
                             #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency cryptocurrency\)"
                             (adapter/cryptocurrency->response-body fake-response-body))))))
+
+(deftest mongodb-document->cryptocurrency
+  (testing "it should adapt a mongodb document to a cryptocurrency"
+    (is (match? cryptocurrency
+                (adapter/mongodb-document->cryptocurrency mongodb-document)))))

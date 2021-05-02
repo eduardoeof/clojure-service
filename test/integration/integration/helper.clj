@@ -3,4 +3,7 @@
             [clojure-service.server :as server]))
 
 (defn create-service []
-  (::bootstrap/service-fn (bootstrap/create-servlet (server/build-service-map))))
+  (::bootstrap/service-fn (-> server/service-map
+                              server/build-service-map
+                              bootstrap/create-servlet)))
+

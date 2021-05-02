@@ -16,7 +16,7 @@
 (defn- wrap-routes [service-map]
   (assoc service-map ::http/routes service/routes))
 
-(defn build-service-map []
+(defn build-service-map [service-map]
   (-> service-map
       wrap-routes
       interceptor/wrap-interceptors))
@@ -24,7 +24,8 @@
 (defn -main
   [& args]
   (println "\nCreating your server...")
-  (-> (build-service-map) 
+  (-> service-map
+      build-service-map
       http/create-server
       http/start))
 

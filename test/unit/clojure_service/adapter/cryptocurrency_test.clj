@@ -23,8 +23,8 @@
                                  :last-updated last-updated}}})
 
 (def cryptocurrency (-> request-body
-                        (assoc :id (java.util.UUID/randomUUID))  
-                        (assoc :created-at (time/local-date-time))
+                        (assoc :id (java.util.UUID/randomUUID)
+                               :created-at (time/local-date-time))  
                         (assoc-in [:quote :USD :last-updated] last-update-date-time)
                         (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
 

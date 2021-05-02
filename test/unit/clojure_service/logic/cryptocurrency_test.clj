@@ -26,7 +26,7 @@
                             :created-at time/local-date-time?}))
 
 (deftest create-cryptocurrency-test
-  (testing "it should create a cryptocurrency from a dto"
+  (testing "should create a cryptocurrency from a dto"
     (is (match? cryptocurrency 
                 (logic/create-cryptocurrency dto)))))
 

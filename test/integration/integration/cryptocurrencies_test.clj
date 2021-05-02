@@ -26,7 +26,7 @@
                           request-body))
 
 (deftest cryptocurrencies-test
-  (testing "Create a cryptocurrency with success"
+  (testing "should create a cryptocurrency with success"
     (let [response (response-for (helper/create-service) 
                                  :post "/api/cryptocurrencies"
                                  :headers {"Content-Type" "application/json"}  
@@ -37,7 +37,7 @@
                   (json/read-str (:body response)
                                  :key-fn keyword)))))
   
-  (testing "Bad request error when tried to create a cryptocurrency"
+  (testing "should responde bad request error when tried to create a cryptocurrency"
     (let [body (dissoc request-body :name)
           response (response-for (helper/create-service) 
                                  :post "/api/cryptocurrencies"
@@ -47,7 +47,7 @@
                    :body (json/write-str {:message "Request not valid"})}
                   response))))
   
-  (testing "it should responde internal server error because response doesn't match the expected schema"
+  (testing "should responde internal server error when response doesn't match the expected schema"
     (binding [controller/create-cryptocurrency (fn [_] {})]
       (let [response (response-for (helper/create-service) 
                                    :post "/api/cryptocurrencies"

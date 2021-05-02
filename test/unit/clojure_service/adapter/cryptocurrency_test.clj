@@ -31,32 +31,32 @@
 (def mongodb-document (assoc cryptocurrency :_id (java.util.UUID/randomUUID)))
 
 (deftest request-body->dto-test
-  (testing "it should adapt a request body to a dto"
+  (testing "should adapt a request body to a dto"
     (is (match? {:quote {:USD {:last-updated last-update-date-time}
                          :BTC {:last-updated last-update-date-time}}}
                 (adapter/request-body->dto request-body))))
   
-  (testing "it should thrown an exception when passed a non request body"
+  (testing "should thrown an exception when passed a non request body"
     (let [fake-request-body {:x 1}]
       (is (thrown-with-msg? java.lang.AssertionError
                             #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
                             (adapter/request-body->dto fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test
-  (testing "it should adapt a cryptocurrency in a response body"
+  (testing "should adapt a cryptocurrency in a response body"
     (is (match? {:id string? 
                  :created-at string? 
                  :quote {:USD {:last-updated last-updated}
                          :BTC {:last-updated last-updated}}}
                 (adapter/cryptocurrency->response-body cryptocurrency))))
   
-  (testing "it should thrown an exception when passed a non response body"
+  (testing "should thrown an exception when passed a non response body"
     (let [fake-response-body {:y 1}]
       (is (thrown-with-msg? java.lang.AssertionError
                             #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency cryptocurrency\)"
                             (adapter/cryptocurrency->response-body fake-response-body))))))
 
 (deftest mongodb-document->cryptocurrency
-  (testing "it should adapt a mongodb document to a cryptocurrency"
+  (testing "should adapt a mongodb document to a cryptocurrency"
     (is (match? cryptocurrency
                 (adapter/mongodb-document->cryptocurrency mongodb-document)))))

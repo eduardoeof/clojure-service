@@ -22,18 +22,19 @@
                                  :percent-change-7d 0.0
                                  :last-updated last-updated}}})
 
-(def cryptocurrency (-> request-body
-                        (assoc :id (java.util.UUID/randomUUID)
-                               :created-at (time/local-date-time))  
-                        (assoc-in [:quote :USD :last-updated] last-update-date-time)
-                        (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
+(def dto (-> request-body
+             (assoc-in [:quote :USD :last-updated] last-update-date-time)
+             (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
+
+(def cryptocurrency (assoc dto 
+                           :id         (java.util.UUID/randomUUID)
+                           :created-at (time/local-date-time)))
 
 (def mongodb-document (assoc cryptocurrency :_id (java.util.UUID/randomUUID)))
 
 (deftest request-body->dto-test
   (testing "should adapt a request body to a dto"
-    (is (match? {:quote {:USD {:last-updated last-update-date-time}
-                         :BTC {:last-updated last-update-date-time}}}
+    (is (match? dto 
                 (adapter/request-body->dto request-body))))
   
   (testing "should thrown an exception when passed a non request body"

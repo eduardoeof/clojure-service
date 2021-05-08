@@ -2,7 +2,7 @@
   (:require [java-time :as time]))
 
 (defn create-cryptocurrency [dto]
-  (-> dto 
-      (assoc :id (java.util.UUID/randomUUID))
-      (assoc :created-at (time/local-date-time))))
+  (assoc dto 
+         :id (java.util.UUID/randomUUID)
+         :created-at (time/local-date-time)))
 

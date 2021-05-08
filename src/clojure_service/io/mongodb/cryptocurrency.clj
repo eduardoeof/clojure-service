@@ -1,6 +1,5 @@
 (ns clojure-service.io.mongodb.cryptocurrency
   (:require [monger.core :as mg]
-            [io.pedestal.log :as log]
             [monger.collection :as mc]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 

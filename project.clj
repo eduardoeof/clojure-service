@@ -31,7 +31,7 @@
 
   :test-paths ["test/integration" "test/unit"]
 
-  :resource-paths ["config", "resources"]
+  :resource-paths ["resources"]
 
   :main ^{:skip-aot true} clojure-service.server
 

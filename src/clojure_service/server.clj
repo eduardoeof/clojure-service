@@ -2,7 +2,10 @@
   (:gen-class) ; for -main method in uberjar
   (:require [io.pedestal.http :as http]
             [clojure-service.interceptor :as interceptor]
-            [clojure-service.service :as service]))
+            [clojure-service.service :as service]
+            [clojure-service.component :as component]))
+
+(def components (atom nil))
 
 (def service-map {:env :prod
                   ::http/type :jetty
@@ -16,10 +19,13 @@
 (defn- wrap-routes [service-map]
   (assoc service-map ::http/routes service/routes))
 
+(defn- init-components []
+  (reset! components (component/create-and-start)))
+
 (defn build-service-map [service-map]
   (-> service-map
       wrap-routes
-      interceptor/wrap-interceptors))
+      (interceptor/wrap-interceptors (init-components))))
 
 (defn -main
   [& args]

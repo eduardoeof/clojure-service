@@ -11,6 +11,8 @@
                  [org.slf4j/jcl-over-slf4j "1.7.26"]
                  [org.slf4j/log4j-over-slf4j "1.7.26"]
                  [clojure.java-time "0.3.2"]
+                 [com.stuartsierra/component "1.0.0"]
+                 [eduardoeof/config-component "1.0.0"]
                  [com.novemberain/monger "3.5.0"]]
 
   :profiles {:dev {:dependencies [[io.pedestal/pedestal.service-tools "0.5.8"]

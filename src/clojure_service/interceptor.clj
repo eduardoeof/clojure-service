@@ -58,9 +58,15 @@
                                     {:exception-type ::bad-response-exception})))
                   context)))}))
 
-(defn wrap-interceptors [service-map]
+(defn- component-interceptor [components]
+  (i/interceptor
+    {:name  ::component-interceptor
+     :enter (fn [context] (assoc-in context [:request :components] components))}))
+
+(defn wrap-interceptors [service-map components]
   (-> service-map
       http/default-interceptors
       (update ::http/interceptors conj (http.body-params/body-params))
       (update ::http/interceptors conj http/json-body)
+      (update ::http/interceptors conj (component-interceptor components))
       (update ::http/interceptors conj error-handler-interceptor)))

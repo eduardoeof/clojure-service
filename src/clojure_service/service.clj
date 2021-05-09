@@ -5,10 +5,10 @@
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (defn- create-cryptocurrency 
-  [{:keys [json-params] :as _request}]
+  [{:keys [json-params components] :as _request}]
   (let [body (-> json-params
                  adapter/request-body->dto
-                 controller/create-cryptocurrency
+                 (controller/create-cryptocurrency components)
                  adapter/cryptocurrency->response-body)]
     {:status 201
      :body body}))

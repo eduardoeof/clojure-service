@@ -60,12 +60,10 @@
                          (func wrong-context))))))
 
 (deftest wrap-interceptors-test
-  (let [system-map (interceptor/wrap-interceptors system-map)]
-    (testing "system-map should have 11 interceptors"
-      (is (match? 11
-                  (-> system-map
-                      :io.pedestal.http/interceptors
-                      count))))
+  (let [system-map (interceptor/wrap-interceptors system-map {})]
+    (testing "system-map should have 12 interceptors"
+      (is (match? 12
+                  (-> system-map :io.pedestal.http/interceptors count))))
 
     (testing "system-map should contain json-body interceptor"
       (is (some? (filter #((= :io.pedestal.http/json-body (:name %)))
@@ -75,6 +73,10 @@
       (is (some? (filter #((= :io.pedestal.http/body-params (:name %)))
                          (:io.pedestal.http/interceptors system-map))))) 
     
+    (testing "system-map should contain component interceptor"
+      (is (some? (filter #((= :clojure-service.interceptor/component-interceptor (:name %)))
+                         (:io.pedestal.http/interceptors system-map))))) 
+
     (testing "system-map should contain error-handler interceptor"
       (is (some? (filter #((= :clojure-service.interceptor/error-handler-interceptor (:name %)))
                          (:io.pedestal.http/interceptors system-map))))))

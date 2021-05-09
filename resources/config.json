@@ -1,0 +1,6 @@
+{
+  "mongodb/host": "0.0.0.0",
+  "mongodb/port": 27017,
+  "mongodb/database": "clojure-service" 
+}
+

@@ -1,15 +1,15 @@
 (ns clojure-service.io.mongodb.cryptocurrency
-  (:require [monger.core :as mg]
+  (:require [monger.core :as m]
             [monger.collection :as mc]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
-(def coll "cryptocurrencies")
+(def collection "cryptocurrencies")
 
-(defn insert! [cryptocurrency]
-  (let [connection (monger.core/connect {:host "0.0.0.0" 
-                                         :port 27017})
-        db (monger.core/get-db connection "clojure-service-db")]
+(defn insert! [cryptocurrency config]
+  (let [connection (m/connect {:host (:mongodb/host config) 
+                               :port (:mongodb/port config)})
+        db (m/get-db connection (:mongodb/database config))]
     (-> db
-        (monger.collection/insert-and-return coll cryptocurrency)
+        (mc/insert-and-return collection cryptocurrency)
         adapter/mongodb-document->cryptocurrency)))
 

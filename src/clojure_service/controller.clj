@@ -4,8 +4,8 @@
 
 (defn ^:dynamic create-cryptocurrency 
   [dto
-   {:keys [config] :as _components}]
+   {:keys [mongodb] :as _components}]
   (-> dto
       logic/create-cryptocurrency
-      (mongodb/insert! config)))
+      (mongodb/insert! mongodb)))
 

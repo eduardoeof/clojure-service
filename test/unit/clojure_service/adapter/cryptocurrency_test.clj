@@ -4,6 +4,8 @@
             [java-time :as time]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
+(def id (java.util.UUID/randomUUID))
+(def created-at (time/local-date-time))
 (def last-updated "2018-08-09T22:53:32.000")
 (def last-update-date-time (time/local-date-time last-updated))
 
@@ -22,13 +24,17 @@
                                  :percent-change-7d 0.0
                                  :last-updated last-updated}}})
 
+(def response-body (assoc request-body
+                          :id         (str id) 
+                          :created-at (time/format created-at)))
+
 (def dto (-> request-body
              (assoc-in [:quote :USD :last-updated] last-update-date-time)
              (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
 
 (def cryptocurrency (assoc dto 
-                           :id         (java.util.UUID/randomUUID)
-                           :created-at (time/local-date-time)))
+                           :id         id 
+                           :created-at created-at))
 
 (def mongodb-document (assoc cryptocurrency :_id (java.util.UUID/randomUUID)))
 
@@ -45,10 +51,7 @@
 
 (deftest cryptocurrency->response-body-test
   (testing "should adapt a cryptocurrency in a response body"
-    (is (match? {:id string? 
-                 :created-at string? 
-                 :quote {:USD {:last-updated last-updated}
-                         :BTC {:last-updated last-updated}}}
+    (is (match? response-body 
                 (adapter/cryptocurrency->response-body cryptocurrency))))
   
   (testing "should thrown an exception when passed a non response body"

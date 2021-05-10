@@ -25,34 +25,58 @@
                            :created-at string?}
                           request-body))
 
-(deftest cryptocurrencies-test
+(defn- http-post [endpoint body]
+  (response-for (helper/create-service) 
+                :post endpoint 
+                :headers {"Content-Type" "application/json"}  
+                :body body))
+
+(defn- http-get [endpoint]
+  (response-for (helper/create-service) 
+                :get endpoint 
+                :headers {"Content-Type" "application/json"}))
+
+(deftest post-cryptocurrencies-test
   (testing "should create a cryptocurrency with success"
-    (let [response (response-for (helper/create-service) 
-                                 :post "/api/cryptocurrencies"
-                                 :headers {"Content-Type" "application/json"}  
-                                 :body (json/write-str request-body))]
-      (is (match? 201
-                  (:status response)))  
+    (let [response (http-post "/api/cryptocurrencies" (json/write-str request-body))]
+
+      (is (match? {:status 201}
+                  response))  
       (is (match? response-body 
                   (json/read-str (:body response)
                                  :key-fn keyword)))))
   
   (testing "should responde bad request error when tried to create a cryptocurrency"
     (let [body (dissoc request-body :name)
-          response (response-for (helper/create-service) 
-                                 :post "/api/cryptocurrencies"
-                                 :headers {"Content-Type" "application/json"}  
-                                 :body (json/write-str body))]
+          response (http-post "/api/cryptocurrencies" (json/write-str body))]
+
       (is (match? {:status 400
                    :body (json/write-str {:message "Request not valid"})}
                   response))))
   
-  (testing "should responde internal server error when response doesn't match the expected schema"
+  (testing "should responde internal server error when response doesn't match to a cryptocurrency"
     (binding [controller/create-cryptocurrency (fn [_] {})]
-      (let [response (response-for (helper/create-service) 
-                                   :post "/api/cryptocurrencies"
-                                   :headers {"Content-Type" "application/json"}  
-                                   :body (json/write-str request-body))]
+      (let [response (http-post "/api/cryptocurrencies" (json/write-str request-body))]
+
+        (is (match? {:status 500
+                     :body (json/write-str {:message "Internal server error"})}
+                    response))))))
+
+(deftest get-cryptocurrencies-test
+  (testing "should get all saved cryptocurrencies"
+    (http-post "/api/cryptocurrencies" request-body)
+
+    (let [response (http-get "/api/cryptocurrencies")]
+      (is (match? {:status 200}
+                  response))
+
+      (is (match? [response-body]
+                  (json/read-str (:body response)
+                                 :key-fn keyword)))))
+
+  (testing "should response internal server error when response doesn't match to a vector of cryptocurrency"
+    (binding [controller/fetch-cryptocurrencies (fn [_] ["fake value"])]
+      (let [response (http-get "/api/cryptocurrencies")]
 
         (is (match? {:status 500
                      :body (json/write-str {:message "Internal server error"})}

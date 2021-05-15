@@ -9,3 +9,5 @@
       logic/create-cryptocurrency
       (mongodb/insert! mongodb)))
 
+(defn ^:dynamic fetch-cryptocurrencies [{:keys [mongodb] :as _components}]
+  (mongodb/find! mongodb))

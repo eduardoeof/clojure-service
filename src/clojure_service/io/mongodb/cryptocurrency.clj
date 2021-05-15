@@ -12,3 +12,7 @@
       (mc/insert-and-return collection cryptocurrency)
       adapter/mongodb-document->cryptocurrency))
 
+(defn find!  [{:keys [db] :as _mongodb}]
+  (->> collection
+       (mc/find db)
+       (map adapter/mongodb-document->cryptocurrency)))

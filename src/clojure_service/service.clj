@@ -13,12 +13,28 @@
     {:status 201
      :body body}))
 
+
+(defn- fetch-cryptocurrencies
+  [{:keys [components] :as _request}]
+  (let [cryptocurrencies (controller/fetch-cryptocurrencies components)
+        body (map adapter/cryptocurrency->response-body cryptocurrencies)]
+    {:status 200
+     :body body}))
+
 (defn- health-check 
   [_request]
   {:status 200
    :body {:message "I have a dream - Martin Luther King, Jr."}})
 
-(def routes #{["/api/health"           :get  `health-check]
-              ["/api/cryptocurrencies" :post [(interceptor/bad-request-interceptor  ::schema.cryptocurrency/request-body)
-                                              (interceptor/bad-response-interceptor ::schema.cryptocurrency/response-body)
-                                              `create-cryptocurrency]]})
+(def routes 
+  #{["/api/health"           
+     :get `health-check]
+
+    ["/api/cryptocurrencies" 
+     :post [(interceptor/bad-request-interceptor  ::schema.cryptocurrency/request-body)
+            (interceptor/bad-response-interceptor ::schema.cryptocurrency/response-body)
+            `create-cryptocurrency]]
+
+    ["/api/cryptocurrencies"
+     :get [`fetch-cryptocurrencies]]})
+

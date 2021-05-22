@@ -29,7 +29,7 @@
 
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
-(s/def ::post-request-body (s/keys :req-un [::name
+(s/def ::request-body (s/keys :req-un [::name
                                        ::type
                                        ::slug
                                        ::quote]))

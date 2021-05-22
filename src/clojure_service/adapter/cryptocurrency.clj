@@ -9,7 +9,7 @@
 ;; TODO: Rename func to request-body->cryptocurrency and 
 (defn request-body->dto 
   [{:keys [name type slug] {:keys [USD BTC]} :quote :as body}]
-  {:pre  [(s/valid? ::schema/post-request-body body)]
+  {:pre  [(s/valid? ::schema/request-body body)]
    :post [(s/valid? ::schema/dto %)]}
   {:name name
    :type type

@@ -52,7 +52,7 @@
   (testing "should thrown an exception when passed a non request body"
     (let [fake-request-body {:x 1}]
       (is (thrown-with-msg? java.lang.AssertionError
-                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/post-request-body body\)"
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
                             (adapter/request-body->dto fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test

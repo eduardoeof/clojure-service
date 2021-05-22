@@ -5,9 +5,11 @@
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (def id (java.util.UUID/randomUUID))
-(def created-at (time/local-date-time))
+(def created-at-instant (time/instant))
+(def created-at (time/local-date-time created-at-instant (time/zone-id "UTC")))
 (def last-updated "2018-08-09T22:53:32.000")
 (def last-update-date-time (time/local-date-time last-updated))
+(def last-update-instant #inst "2018-08-09T22:53:32.000-00:00")
 
 (def request-body {:name "Bitcoin"
                    :type "BTC"
@@ -36,7 +38,11 @@
                            :id         id 
                            :created-at created-at))
 
-(def mongodb-document (assoc cryptocurrency :_id (java.util.UUID/randomUUID)))
+(def mongodb-document (-> cryptocurrency
+                          (assoc :_id (java.util.UUID/randomUUID)
+                                 :created-at created-at-instant)
+                          (assoc-in [:quote :USD :last-updated] last-update-instant)
+                          (assoc-in [:quote :BTC :last-updated] last-update-instant)))
 
 (deftest request-body->dto-test
   (testing "should adapt a request body to a dto"
@@ -46,7 +52,7 @@
   (testing "should thrown an exception when passed a non request body"
     (let [fake-request-body {:x 1}]
       (is (thrown-with-msg? java.lang.AssertionError
-                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/post-request-body body\)"
                             (adapter/request-body->dto fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test
@@ -63,4 +69,8 @@
 (deftest mongodb-document->cryptocurrency
   (testing "should adapt a mongodb document to a cryptocurrency"
     (is (match? cryptocurrency
-                (adapter/mongodb-document->cryptocurrency mongodb-document)))))
+                (adapter/mongodb-document->cryptocurrency mongodb-document)))) 
+  
+  ;; TODO: exception validation
+  )
+

@@ -3,14 +3,13 @@
             [clojure.spec.alpha :as s]
             [clojure-service.schema.cryptocurrency :as schema]))
 
+(def utc-zone-id (time/zone-id "UTC"))
 (def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS")
 
-;; TODO: Use destructuring 
+;; TODO: Rename func to request-body->cryptocurrency and 
 (defn request-body->dto 
-  [{:keys [name type slug] 
-          {:keys [USD BTC]} :quote 
-          :as body}]
-  {:pre  [(s/valid? ::schema/request-body body)]
+  [{:keys [name type slug] {:keys [USD BTC]} :quote :as body}]
+  {:pre  [(s/valid? ::schema/post-request-body body)]
    :post [(s/valid? ::schema/dto %)]}
   {:name name
    :type type
@@ -32,7 +31,7 @@
           {:keys [USD BTC]} :quote 
           :as cryptocurrency}]
   {:pre  [(s/valid? ::schema/cryptocurrency cryptocurrency)]
-   :post [(s/valid? ::schema/response-body %)]}
+   :post [(s/valid? ::schema/post-response-body %)]}
   {:id (str id)
    :name name
    :type type
@@ -50,7 +49,31 @@
                  :last-updated       (->> BTC :last-updated (time/format date-time-format))
                  :volume-24h         (:volume-24h BTC)}}})
 
-(defn mongodb-document->cryptocurrency [document]
+(defn mongodb-document->cryptocurrency 
+  [{:keys [id name type slug created-at] {:keys [USD BTC]} :quote :as _document}]
+  {:post [(s/valid? ::schema/cryptocurrency %)]}
+  {:id id 
+   :name name
+   :type type
+   :slug slug
+   :created-at (time/local-date-time created-at utc-zone-id)
+   :quote {:USD {:price              (:price USD)
+                 :percent-change-1h  (:percent-change-1h USD)
+                 :percent-change-24h (:percent-change-24h USD)
+                 :percent-change-7d  (:percent-change-7d USD)
+                 :last-updated       (-> USD :last-updated (time/local-date-time utc-zone-id))}
+           :BTC {:price              (:price BTC)
+                 :percent-change-1h  (:percent-change-1h BTC)
+                 :percent-change-24h (:percent-change-24h BTC)
+                 :percent-change-7d  (:percent-change-7d BTC)
+                 :last-updated       (-> BTC :last-updated (time/local-date-time utc-zone-id))
+                 :volume-24h         (:volume-24h BTC)}}})
+
+#_(defn mongodb-document->cryptocurrency [document]
   {:post [(s/valid? ::schema/cryptocurrency %)]}
   (dissoc document :_id))
+
+(defn cryptocurrencies->response-body
+  [cryptocurrencies]
+  {:cryptocurrecies (map cryptocurrency->response-body cryptocurrencies)})
 

@@ -29,17 +29,19 @@
 
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
-(s/def ::request-body (s/keys :req-un [::name
+(s/def ::post-request-body (s/keys :req-un [::name
                                        ::type
                                        ::slug
                                        ::quote]))
 
-(s/def ::response-body (s/keys :req-un [::id
-                                        ::created-at
-                                        ::name
-                                        ::type
-                                        ::slug
-                                        ::quote]))
+(s/def ::post-response-body (s/keys :req-un [::id
+                                             ::created-at
+                                             ::name
+                                             ::type
+                                             ::slug
+                                             ::quote]))
+
+(s/def ::get-response-body (s/coll-of ::post-response-body))
 
 (s/def ::dto (s/keys :req-un [::name
                               ::type
@@ -52,3 +54,4 @@
                                          ::type
                                          ::slug
                                          ::model/quote]))
+

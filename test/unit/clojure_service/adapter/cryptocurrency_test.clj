@@ -44,6 +44,9 @@
                           (assoc-in [:quote :USD :last-updated] last-update-instant)
                           (assoc-in [:quote :BTC :last-updated] last-update-instant)))
 
+(def mongodb-document-fake (dissoc mongodb-document :name))
+
+
 (deftest request-body->dto-test
   (testing "should adapt a request body to a dto"
     (is (match? dto 
@@ -71,6 +74,8 @@
     (is (match? cryptocurrency
                 (adapter/mongodb-document->cryptocurrency mongodb-document)))) 
   
-  ;; TODO: exception validation
-  )
+  (testing "should thrown an exception when returned a non cryptocurrency"
+    (is (thrown-with-msg? java.lang.AssertionError
+                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency \%\)"
+                          (adapter/mongodb-document->cryptocurrency mongodb-document-fake)))))
 

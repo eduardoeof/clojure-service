@@ -1,6 +1,5 @@
 (ns clojure-service.io.mongodb.cryptocurrency
-  (:require [monger.core :as m]
-            [monger.collection :as mc]
+  (:require [monger.collection :as monger]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (def collection "cryptocurrencies")
@@ -9,10 +8,11 @@
   [cryptocurrency 
    {:keys [db] :as _mongodb}]
   (-> db
-      (mc/insert-and-return collection cryptocurrency)
+      (monger/insert-and-return collection cryptocurrency)
       adapter/mongodb-document->cryptocurrency))
 
-(defn find!  [{:keys [db] :as _mongodb}]
+(defn find-maps [{:keys [db] :as _mongodb}]
   (->> collection
-       (mc/find db)
+       (monger/find-maps db)
        (map adapter/mongodb-document->cryptocurrency)))
+

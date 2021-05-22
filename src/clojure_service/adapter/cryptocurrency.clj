@@ -69,10 +69,6 @@
                  :last-updated       (-> BTC :last-updated (time/local-date-time utc-zone-id))
                  :volume-24h         (:volume-24h BTC)}}})
 
-#_(defn mongodb-document->cryptocurrency [document]
-  {:post [(s/valid? ::schema/cryptocurrency %)]}
-  (dissoc document :_id))
-
 (defn cryptocurrencies->response-body
   [cryptocurrencies]
   {:cryptocurrecies (map cryptocurrency->response-body cryptocurrencies)})

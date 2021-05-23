@@ -1,6 +1,7 @@
 (ns integration.util.http
   (:require [io.pedestal.test :refer [response-for]]
             [io.pedestal.http :as bootstrap]
+            [clojure.data.json :as json] 
             [clojure-service.server :as server]))
 
 (defn- create-service [components]

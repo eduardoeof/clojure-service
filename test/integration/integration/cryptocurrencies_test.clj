@@ -1,9 +1,6 @@
 (ns integration.cryptocurrencies-test
   (:require [clojure.test :refer :all]
-            [clojure.data.json :as json] 
-            [io.pedestal.test :refer [response-for]]
             [matcher-combinators.test :refer [match?]]
-            [integration.util.service :as util.service]
             [integration.util.mongodb :as util.mongodb]
             [clojure-service.controller :as controller]
             [clojure-service.component :as component]

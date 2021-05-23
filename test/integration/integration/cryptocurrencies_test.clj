@@ -1,11 +1,11 @@
 (ns integration.cryptocurrencies-test
   (:require [clojure.test :refer :all]
+            [clojure.data.json :as json] 
             [io.pedestal.test :refer [response-for]]
             [matcher-combinators.test :refer [match?]]
-            [clojure.data.json :as json] 
-            [integration.helper :as helper]
-            [clojure-service.controller :as controller]
+            [integration.util.service :as util.service]
             [integration.util.mongodb :as util.mongodb]
+            [clojure-service.controller :as controller]
             [clojure-service.component :as component]))
 
 (def components (atom nil))
@@ -37,13 +37,13 @@
 (def get-response-body {:cryptocurrencies [cryptocurrency-json]})
 
 (defn- http-post [endpoint body]
-  (response-for (helper/create-service @components) 
+  (response-for (util.service/create-service @components) 
                 :post endpoint 
                 :headers {"Content-Type" "application/json"}  
                 :body body))
 
 (defn- http-get [endpoint]
-  (response-for (helper/create-service @components) 
+  (response-for (util.service/create-service @components) 
                 :get endpoint 
                 :headers {"Content-Type" "application/json"}))
 

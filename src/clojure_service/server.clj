@@ -19,19 +19,19 @@
 (defn- wrap-routes [service-map]
   (assoc service-map ::http/routes service/routes))
 
-(defn- init-components []
+(defn- create-components []
   (reset! components (component/create-and-start)))
 
-(defn build-service-map [service-map]
+(defn build-service-map [service-map components]
   (-> service-map
       wrap-routes
-      (interceptor/wrap-interceptors (init-components))))
+      (interceptor/wrap-interceptors components)))
 
 (defn -main
   [& args]
   (println "\nCreating your server...")
   (-> service-map
-      build-service-map
+      (build-service-map (create-components))
       http/create-server
       http/start))
 

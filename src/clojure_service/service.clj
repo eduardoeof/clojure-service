@@ -1,6 +1,7 @@
 (ns clojure-service.service
   (:require [clojure-service.interceptor :as interceptor]
-            [clojure-service.schema.cryptocurrency :as schema.cryptocurrency]
+            [clojure-service.schema.cryptocurrency.dto :as schema.dto]
+            [clojure-service.schema.cryptocurrency :as schema]
             [clojure-service.controller :as controller]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
@@ -13,11 +14,11 @@
     {:status 201
      :body body}))
 
-
-(defn- fetch-cryptocurrencies
+(defn- get-cryptocurrencies
   [{:keys [components] :as _request}]
-  (let [cryptocurrencies (controller/fetch-cryptocurrencies components)
-        body (map adapter/cryptocurrency->response-body cryptocurrencies)]
+  (let [body (-> components
+                 controller/get-cryptocurrencies
+                 adapter/cryptocurrencies->response-body)]
     {:status 200
      :body body}))
 
@@ -31,10 +32,12 @@
      :get `health-check]
 
     ["/api/cryptocurrencies" 
-     :post [(interceptor/bad-request-interceptor  ::schema.cryptocurrency/request-body)
-            (interceptor/bad-response-interceptor ::schema.cryptocurrency/response-body)
+     :post [(interceptor/bad-request-interceptor  ::schema/request-body)
+            (interceptor/bad-response-interceptor ::schema/post-response-body)
             `create-cryptocurrency]]
 
     ["/api/cryptocurrencies"
-     :get [`fetch-cryptocurrencies]]})
+     :get [(interceptor/bad-response-interceptor ::schema.dto/get-response-body)
+           `get-cryptocurrencies]]})
+
 

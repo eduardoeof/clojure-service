@@ -71,5 +71,5 @@
 
 (defn cryptocurrencies->response-body
   [cryptocurrencies]
-  {:cryptocurrecies (map cryptocurrency->response-body cryptocurrencies)})
+  {:cryptocurrencies (map cryptocurrency->response-body cryptocurrencies)})
 

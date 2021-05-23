@@ -6,9 +6,22 @@
             [integration.util.service :as util.service]
             [integration.util.mongodb :as util.mongodb]
             [clojure-service.controller :as controller]
-            [clojure-service.component :as component]))
+            [clojure-service.component :as component]
+            [integration.util.http :refer [http-post http-get json->edn edn->json]]))
 
 (def components (atom nil))
+
+(defn fixtures-once [test-case]
+  (reset! components (component/create-and-start)) 
+  (test-case)
+  (reset! components nil))
+
+(defn fixtures-each [test-case]
+  (test-case)
+  (util.mongodb/drop-collection "cryptocurrencies" (:mongodb @components)))
+
+(use-fixtures :once fixtures-once)
+(use-fixtures :each fixtures-each)
 
 (def request-body {:name "Bitcoin"
                    :type "BTC"
@@ -36,39 +49,11 @@
 
 (def get-response-body {:cryptocurrencies [cryptocurrency-json]})
 
-(defn- http-post [endpoint body]
-  (response-for (util.service/create-service @components) 
-                :post endpoint 
-                :headers {"Content-Type" "application/json"}  
-                :body body))
-
-(defn- http-get [endpoint]
-  (response-for (util.service/create-service @components) 
-                :get endpoint 
-                :headers {"Content-Type" "application/json"}))
-
-(defn json->edn [json]
-  (json/read-str json :key-fn keyword))
-
-(defn edn->json [edn]
-  (json/write-str edn))
-
-(defn fixtures-once [test-case]
-  (reset! components (component/create-and-start)) 
-  (test-case)
-  (reset! components nil))
-
-(defn fixtures-each [test-case]
-  (test-case)
-  (util.mongodb/drop-collection "cryptocurrencies" (:mongodb @components)))
-
-;; TODO: Try to put all fixtures in teh same call
-(use-fixtures :once fixtures-once)
-(use-fixtures :each fixtures-each)
-
 (deftest post-cryptocurrencies-test
   (testing "should create a cryptocurrency with success"
-    (let [response (http-post "/api/cryptocurrencies" (edn->json request-body))]
+    (let [response (http-post "/api/cryptocurrencies" 
+                              (edn->json request-body)
+                              @components)]
       (is (match? {:status 201}
                   response))  
       (is (match? response-body 
@@ -76,25 +61,27 @@
   
   (testing "should responde bad request error when tried to create a cryptocurrency"
     (let [body (dissoc request-body :name)
-          response (http-post "/api/cryptocurrencies" (edn->json body))]
-
+          response (http-post "/api/cryptocurrencies" 
+                              (edn->json body)
+                              @components)]
       (is (match? {:status 400
                    :body (edn->json {:message "Request not valid"})}
                   response))))
   
   (testing "should responde internal server error when response doesn't match to a cryptocurrency"
     (binding [controller/create-cryptocurrency (fn [_] {})]
-      (let [response (http-post "/api/cryptocurrencies" (edn->json request-body))]
-
+      (let [response (http-post "/api/cryptocurrencies" 
+                                (edn->json request-body)
+                                @components)]
         (is (match? {:status 500
                      :body (edn->json {:message "Internal server error"})}
                     response))))))
 
 (deftest get-cryptocurrencies-test
   (testing "should get all saved cryptocurrencies"
-    (http-post "/api/cryptocurrencies" (edn->json request-body))
+    (http-post "/api/cryptocurrencies" (edn->json request-body) @components)
 
-    (let [response (http-get "/api/cryptocurrencies")]
+    (let [response (http-get "/api/cryptocurrencies" @components)]
       (is (match? {:status 200}
                   response))
 
@@ -103,8 +90,7 @@
 
   (testing "should response internal server error when response doesn't match to a vector of cryptocurrency"
     (binding [controller/get-cryptocurrencies (fn [_] ["fake value"])]
-      (let [response (http-get "/api/cryptocurrencies")]
-
+      (let [response (http-get "/api/cryptocurrencies" @components)]
         (is (match? {:status 500
                      :body (edn->json {:message "Internal server error"})}
                     response))))))

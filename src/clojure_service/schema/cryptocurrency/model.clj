@@ -4,6 +4,9 @@
 
 (s/def ::id uuid?)
 (s/def ::created-at local-date-time?)
+(s/def ::name string?)
+(s/def ::type string?)
+(s/def ::slug string?)
 (s/def ::price float?)
 (s/def ::percent-change-1h float?)
 (s/def ::percent-change-24h float?)
@@ -25,3 +28,13 @@
                               ::volume-24h]))
 
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
+
+(s/def ::cryptocurrency (s/keys :req-un [::id
+                                         ::created-at
+                                         ::name
+                                         ::type
+                                         ::slug
+                                         ::quote]))
+
+(s/def ::cryptocurrencies (s/coll-of ::cryptocurrency :kind vector))
+

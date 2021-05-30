@@ -35,7 +35,7 @@
                                          ::slug
                                          ::quote]))
 
-(s/def ::cryptocurrencies (s/coll-of ::cryptocurrency))
+(s/def ::cryptocurrencies (s/coll-of ::cryptocurrency :kind vector))
 
 (s/def ::request-body (s/keys :req-un [::name
                                        ::type

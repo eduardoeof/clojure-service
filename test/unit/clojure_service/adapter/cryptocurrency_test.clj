@@ -26,17 +26,21 @@
                                  :percent-change-7d 0.0
                                  :last-updated last-updated}}})
 
-(def response-body (assoc request-body
-                          :id         (str id) 
-                          :created-at (time/format created-at)))
+(def cryptocurrency-json (assoc request-body 
+                                :id (str id) 
+                                :created-at (time/format created-at)))
+
+(def response-body {:cryptocurrency cryptocurrency-json})
 
 (def dto (-> request-body
              (assoc-in [:quote :USD :last-updated] last-update-date-time)
              (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
 
-(def cryptocurrency (assoc dto 
-                           :id         id 
-                           :created-at created-at))
+(def cryptocurrency (-> request-body 
+                        (assoc :id         id 
+                               :created-at created-at)
+                        (assoc-in [:quote :USD :last-updated] last-update-date-time)
+                        (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
 
 (def mongodb-document (-> cryptocurrency
                           (assoc :_id (java.util.UUID/randomUUID)
@@ -66,7 +70,7 @@
   (testing "should thrown an exception when passed a non response body"
     (let [fake-response-body {:y 1}]
       (is (thrown-with-msg? java.lang.AssertionError
-                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency cryptocurrency\)"
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrency cryptocurrency\)"
                             (adapter/cryptocurrency->response-body fake-response-body))))))
 
 (deftest mongodb-document->cryptocurrency
@@ -78,4 +82,18 @@
     (is (thrown-with-msg? java.lang.AssertionError
                           #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency \%\)"
                           (adapter/mongodb-document->cryptocurrency mongodb-document-fake)))))
+
+(deftest cryptocurrencies->response-body-test
+  (testing "should adapt an vector of cryptocurrency in a response body"
+    (is (match? {:cryptocurrencies [cryptocurrency-json]}
+                (adapter/cryptocurrencies->response-body [cryptocurrency]))))  
+
+  (testing "should thrown an exception when passed a vector of non cryptocurrency"
+    (is (thrown-with-msg? java.lang.AssertionError
+                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrencies cryptocurrencies\)"
+                          (adapter/cryptocurrencies->response-body ["fake-crypto"])))))
+
+(comment
+  (clojure.spec.alpha/check-asserts true)
+  (clojure.spec.alpha/assert :clojure-service.schema.cryptocurrency.model/cryptocurrencies [cryptocurrency]))
 

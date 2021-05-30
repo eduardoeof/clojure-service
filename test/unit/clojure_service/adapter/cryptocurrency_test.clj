@@ -32,10 +32,6 @@
 
 (def response-body {:cryptocurrency cryptocurrency-json})
 
-(def dto (-> request-body
-             (assoc-in [:quote :USD :last-updated] last-update-date-time)
-             (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
-
 (def cryptocurrency (-> request-body 
                         (assoc :id         id 
                                :created-at created-at)
@@ -50,17 +46,16 @@
 
 (def mongodb-document-fake (dissoc mongodb-document :name))
 
-
-(deftest request-body->dto-test
+(deftest request-body->cryptocurrency-test
   (testing "should adapt a request body to a dto"
-    (is (match? dto 
-                (adapter/request-body->dto request-body))))
+    (is (match? (adapter/request-body->cryptocurrency request-body)
+                cryptocurrency)))
   
   (testing "should thrown an exception when passed a non request body"
     (let [fake-request-body {:x 1}]
       (is (thrown-with-msg? java.lang.AssertionError
                             #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
-                            (adapter/request-body->dto fake-request-body))))))
+                            (adapter/request-body->cryptocurrency fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test
   (testing "should adapt a cryptocurrency in a response body"

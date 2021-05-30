@@ -29,12 +29,12 @@
 
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
-(s/def ::cryptocurrency (s/keys :req-un [::id
-                                         ::created-at
-                                         ::name
+(s/def ::cryptocurrency (s/keys :req-un [::name
                                          ::type
                                          ::slug
-                                         ::quote]))
+                                         ::quote]
+                                :opt [::id
+                                      ::created-at]))
 
 (s/def ::cryptocurrencies (s/coll-of ::cryptocurrency :kind vector))
 

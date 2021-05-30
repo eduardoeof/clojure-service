@@ -28,11 +28,10 @@
                  :last-updated       (->> BTC :last-updated (time/format date-time-format))
                  :volume-24h         (:volume-24h BTC)}}})
 
-;; TODO: Rename func to request-body->cryptocurrency and 
-(defn request-body->dto 
+(defn request-body->cryptocurrency 
   [{:keys [name type slug] {:keys [USD BTC]} :quote :as body}]
   {:pre  [(s/valid? ::schema/request-body body)]
-   :post [(s/valid? ::schema/dto %)]}
+   :post [(s/valid? ::schema.model/cryptocurrency %)]}
   {:name name
    :type type
    :slug slug

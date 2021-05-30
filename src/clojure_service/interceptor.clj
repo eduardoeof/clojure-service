@@ -6,7 +6,12 @@
             [io.pedestal.interceptor.error :as interceptor.error]
             [io.pedestal.http.body-params :as http.body-params]))
 
-(defn ^:private log-and-response [status message exception]
+(defn- component-interceptor [components]
+  (i/interceptor
+    {:name  ::component-interceptor
+     :enter (fn [context] (assoc-in context [:request :components] components))}))
+
+(defn-  log-and-response [status message exception]
   (log/error :message message
              :exception exception)
   {:status status
@@ -57,11 +62,6 @@
                     (throw (ex-info "Body response doesn't match with expected schema"
                                     {:exception-type ::bad-response-exception})))
                   context)))}))
-
-(defn- component-interceptor [components]
-  (i/interceptor
-    {:name  ::component-interceptor
-     :enter (fn [context] (assoc-in context [:request :components] components))}))
 
 (defn wrap-interceptors [service-map components]
   (-> service-map

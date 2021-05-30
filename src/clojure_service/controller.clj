@@ -3,9 +3,9 @@
             [clojure-service.io.mongodb.cryptocurrency :as mongodb]))
 
 (defn ^:dynamic create-cryptocurrency 
-  [dto
+  [cryptocurrency
    {:keys [mongodb] :as _components}]
-  (-> dto
+  (-> cryptocurrency 
       logic/create-cryptocurrency
       (mongodb/insert! mongodb)))
 

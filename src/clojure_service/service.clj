@@ -31,7 +31,7 @@
      :get `health-check]
 
     ["/api/cryptocurrencies" 
-     :post [(interceptor/bad-request-interceptor  ::schema/request-body)
+     :post [(interceptor/bad-request-interceptor ::schema/request-body)
             (interceptor/bad-response-interceptor ::schema/post-response-body)
             `create-cryptocurrency]]
 

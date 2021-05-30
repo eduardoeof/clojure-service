@@ -2,8 +2,7 @@
   (:require [java-time :as time]
             [clojure.spec.alpha :as s]
             [clojure-service.schema.cryptocurrency.model :as schema.model]
-            [clojure-service.schema.cryptocurrency.dto :as schema.dto]
-            [clojure-service.schema.cryptocurrency :as schema]))
+            [clojure-service.schema.cryptocurrency.dto :as schema.dto]))
 
 (def utc-zone-id (time/zone-id "UTC"))
 (def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS")
@@ -30,7 +29,7 @@
 
 (defn request-body->cryptocurrency 
   [{:keys [name type slug] {:keys [USD BTC]} :quote :as body}]
-  {:pre  [(s/valid? ::schema/request-body body)]
+  {:pre  [(s/valid? ::schema.dto/request-body body)]
    :post [(s/valid? ::schema.model/cryptocurrency %)]}
   {:name name
    :type type
@@ -55,7 +54,7 @@
 
 (defn mongodb-document->cryptocurrency 
   [{:keys [id name type slug created-at] {:keys [USD BTC]} :quote :as _document}]
-  {:post [(s/valid? ::schema/cryptocurrency %)]}
+  {:post [(s/valid? ::schema.model/cryptocurrency %)]}
   {:id id 
    :name name
    :type type

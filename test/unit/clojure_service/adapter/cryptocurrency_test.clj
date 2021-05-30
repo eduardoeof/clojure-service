@@ -54,7 +54,7 @@
   (testing "should thrown an exception when passed a non request body"
     (let [fake-request-body {:x 1}]
       (is (thrown-with-msg? java.lang.AssertionError
-                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/request-body body\)"
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.dto\/request-body body\)"
                             (adapter/request-body->cryptocurrency fake-request-body))))))
 
 (deftest cryptocurrency->response-body-test
@@ -75,7 +75,7 @@
   
   (testing "should thrown an exception when returned a non cryptocurrency"
     (is (thrown-with-msg? java.lang.AssertionError
-                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency\/cryptocurrency \%\)"
+                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrency \%\)"
                           (adapter/mongodb-document->cryptocurrency mongodb-document-fake)))))
 
 (deftest cryptocurrencies->response-body-test

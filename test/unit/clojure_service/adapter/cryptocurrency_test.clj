@@ -30,8 +30,6 @@
                                 :id (str id) 
                                 :created-at (time/format created-at)))
 
-(def response-body {:cryptocurrency cryptocurrency-json})
-
 (def cryptocurrency (-> request-body 
                         (assoc :id         id 
                                :created-at created-at)
@@ -59,7 +57,7 @@
 
 (deftest cryptocurrency->response-body-test
   (testing "should adapt a cryptocurrency in a response body"
-    (is (match? response-body 
+    (is (match? {:cryptocurrency cryptocurrency-json} 
                 (adapter/cryptocurrency->response-body cryptocurrency))))
   
   (testing "should thrown an exception when passed a non response body"

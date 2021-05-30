@@ -1,7 +1,6 @@
 (ns clojure-service.service
   (:require [clojure-service.interceptor :as interceptor]
-            [clojure-service.schema.cryptocurrency.dto :as schema.dto]
-            [clojure-service.schema.cryptocurrency :as schema]
+            [clojure-service.schema.cryptocurrency.dto :as schema]
             [clojure-service.controller :as controller]
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
@@ -37,7 +36,7 @@
             `create-cryptocurrency]]
 
     ["/api/cryptocurrencies"
-     :get [(interceptor/bad-response-interceptor ::schema.dto/get-response-body)
+     :get [(interceptor/bad-response-interceptor ::schema/get-response-body)
            `get-cryptocurrencies]]})
 
 

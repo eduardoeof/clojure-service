@@ -35,16 +35,13 @@
                                  :last-updated "2018-08-09T22:53:32.000"
                                  :volume-24h 772012}}})
 
-(def cryptocurrency-json (assoc request-body
-                                :id string?
-                                :created-at string?))
+(def cryptocurrency (assoc request-body
+                           :id string?
+                           :created-at string?))
 
-;; TODO: should be {:cryptocurrency {}}
-(def response-body (assoc request-body
-                          :id string?
-                          :created-at string?))
+(def post-response-body {:cryptocurrency cryptocurrency})
 
-(def get-response-body {:cryptocurrencies [cryptocurrency-json]})
+(def get-response-body {:cryptocurrencies [cryptocurrency]})
 
 (deftest post-cryptocurrencies-test
   (testing "should create a cryptocurrency with success"
@@ -53,7 +50,7 @@
                               @components)]
       (is (match? {:status 201}
                   response))  
-      (is (match? response-body 
+      (is (match? {:cryptocurrency cryptocurrency} 
                   (json->edn (:body response))))))
   
   (testing "should responde bad request error when tried to create a cryptocurrency"
@@ -82,7 +79,7 @@
       (is (match? {:status 200}
                   response))
 
-      (is (match? {:cryptocurrencies [cryptocurrency-json]}
+      (is (match? {:cryptocurrencies [cryptocurrency]}
                   (json->edn (:body response))))))
 
   (testing "should response internal server error when response doesn't match to a vector of cryptocurrency"

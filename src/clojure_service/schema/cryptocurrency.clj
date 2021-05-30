@@ -29,10 +29,25 @@
 
 (s/def ::quote (s/keys :req-un [::USD ::BTC]))
 
+(s/def ::cryptocurrency (s/keys :req-un [::model/id
+                                         ::model/created-at
+                                         ::name
+                                         ::type
+                                         ::slug
+                                         ::model/quote]))
+
+(s/def ::cryptocurrency-json (s/keys :req-un [::id
+                                              ::created-at
+                                              ::name
+                                              ::type
+                                              ::slug
+                                              ::quote]))
+
 (s/def ::request-body (s/keys :req-un [::name
                                        ::type
                                        ::slug
                                        ::quote]))
+
 
 (s/def ::post-response-body (s/keys :req-un [::id
                                              ::created-at
@@ -48,10 +63,4 @@
                               ::slug
                               ::model/quote]))
 
-(s/def ::cryptocurrency (s/keys :req-un [::model/id
-                                         ::model/created-at
-                                         ::name
-                                         ::type
-                                         ::slug
-                                         ::model/quote]))
 

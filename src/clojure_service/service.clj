@@ -15,17 +15,21 @@
 
 (defn- get-cryptocurrencies
   [{:keys [components] :as _request}]
-  (let [body (-> components
-                 controller/get-cryptocurrencies
-                 adapter/cryptocurrencies->response-body)]
+  (let [body (->> components
+                  controller/get-cryptocurrencies
+                  adapter/cryptocurrencies->response-body)]
     {:status 200
      :body body}))
 
 (defn- get-cryptocurrency-by-id
   [{{id :id} :path-params
     components :components :as _request}]
-  {:status 200
-   :body {:cryptocurrency {:id id}}})
+  ;; TODO: Adapter ->params
+  (let [body (-> {:id (java.util.UUID/fromString id)}
+                 (controller/get-cryptocurrencies components)
+                 adapter/cryptocurrency->response-body)]
+    {:status 200
+     :body body}))
 
 (defn- health-check 
   [_request]
@@ -46,5 +50,4 @@
     ["/api/cryptocurrencies/:id" :get [#_(interceptor/bad-response-interceptor ::schema/get-response-body)
                                        `get-cryptocurrency-by-id]
                                  :route-name :get-cryptocurrency-by-id]})
-
 

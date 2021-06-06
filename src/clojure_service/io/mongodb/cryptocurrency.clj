@@ -16,3 +16,9 @@
        (monger/find-maps db)
        (map adapter/mongodb-document->cryptocurrency)))
 
+(defn find-by-id 
+  [id
+   {:keys [db] :as _mongodb}]
+  (->> {:id id}
+       (monger/find-one-as-map db collection)
+       adapter/mongodb-document->cryptocurrency))

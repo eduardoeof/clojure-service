@@ -82,6 +82,19 @@
       (is (match? {:cryptocurrencies [cryptocurrency]}
                   (json->edn (:body response))))))
 
+  (testing "should get a cryptocurrency by id"
+    (let [cryptocurrency-id (-> (http-post "/api/cryptocurrencies" (edn->json request-body) @components)
+                                :body
+                                json->edn
+                                :cryptocurrency
+                                :id)
+          response (http-get (str "/api/cryptocurrencies/" cryptocurrency-id) @components)]
+      (is (match? {:status 200}
+                  response))     
+      (is (match? {:cryptocurrency (merge {:id cryptocurrency-id}
+                                          cryptocurrency)}
+                  (-> response :body json->edn)))))
+
   (testing "should response internal server error when response doesn't match to a vector of cryptocurrency"
     (binding [controller/get-cryptocurrencies (fn [_] ["fake value"])]
       (let [response (http-get "/api/cryptocurrencies" @components)]

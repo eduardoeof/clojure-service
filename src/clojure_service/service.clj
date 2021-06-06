@@ -21,22 +21,30 @@
     {:status 200
      :body body}))
 
+(defn- get-cryptocurrency-by-id
+  [{{id :id} :path-params
+    components :components :as _request}]
+  {:status 200
+   :body {:cryptocurrency {:id id}}})
+
 (defn- health-check 
   [_request]
   {:status 200
    :body {:message "I have a dream - Martin Luther King, Jr."}})
 
 (def routes 
-  #{["/api/health"           
-     :get `health-check]
+  #{["/api/health" :get `health-check]
 
-    ["/api/cryptocurrencies" 
-     :post [(interceptor/bad-request-interceptor ::schema/request-body)
-            (interceptor/bad-response-interceptor ::schema/post-response-body)
-            `create-cryptocurrency]]
+    ["/api/cryptocurrencies" :post [(interceptor/bad-request-interceptor ::schema/request-body)
+                                    (interceptor/bad-response-interceptor ::schema/post-response-body)
+                                    `create-cryptocurrency]]
 
-    ["/api/cryptocurrencies"
-     :get [(interceptor/bad-response-interceptor ::schema/get-response-body)
-           `get-cryptocurrencies]]})
+    ["/api/cryptocurrencies" :get [(interceptor/bad-response-interceptor ::schema/get-response-body)
+                                   `get-cryptocurrencies]
+                             :route-name :get-cryptocurrencies]
+    
+    ["/api/cryptocurrencies/:id" :get [#_(interceptor/bad-response-interceptor ::schema/get-response-body)
+                                       `get-cryptocurrency-by-id]
+                                 :route-name :get-cryptocurrency-by-id]})
 
 

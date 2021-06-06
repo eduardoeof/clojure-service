@@ -51,7 +51,7 @@
       (is (match? {:status 201}
                   response))  
       (is (match? {:cryptocurrency cryptocurrency} 
-                  (json->edn (:body response))))))
+                  (-> response :body json->edn)))))
   
   (testing "should responde bad request error when tried to create a cryptocurrency"
     (let [body (dissoc request-body :name)
@@ -80,7 +80,7 @@
                   response))
 
       (is (match? {:cryptocurrencies [cryptocurrency]}
-                  (json->edn (:body response))))))
+                  (-> response :body json->edn)))))
 
   (testing "should get a cryptocurrency by id"
     (let [cryptocurrency-id (-> (http-post "/api/cryptocurrencies" (edn->json request-body) @components)

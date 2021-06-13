@@ -100,3 +100,30 @@
                      :body (edn->json {:message "Internal server error"})}
                     response))))))
 
+(deftest get-cryptocurrencies-by-type-test
+  (testing "given two different types of cryptocurrency (BTC and ETH)"
+    (let [bitcoin  (edn->json request-body)
+          ethereum (-> request-body
+                       (assoc :name "Ethereum" 
+                              :type "ETH"
+                              :slug "ethereum")
+                       edn->json)]
+
+      (http-post "/api/cryptocurrencies" bitcoin @components)
+      (http-post "/api/cryptocurrencies" ethereum @components))    
+
+    (testing "when the endpoint GET /api/cryptocurrencies is requested by type BTC"
+      (let [response (http-get "/api/cryptocurrencies?type=BTC" @components)]
+
+        (testing "should only get the historic of BTC cryptocurrency"
+          (is (match? {:status 200}
+                      response)) 
+          (is (match? {:cryptocurrencies [{:type "BTC"}]}
+                      (-> response :body json->edn))))))
+
+    (testing "when the endpoint GET /api/cryptocurrencies is requested by an unknown type"
+      (let [response (http-get "/api/cryptocurrencies?type=XYZ" @components)]
+
+        (testing "should get an empty collection"
+          (is (empty? (-> response :body json->edn))))))))
+

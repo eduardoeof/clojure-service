@@ -39,10 +39,6 @@
                            :id string?
                            :created-at string?))
 
-(def post-response-body {:cryptocurrency cryptocurrency})
-
-(def get-response-body {:cryptocurrencies [cryptocurrency]})
-
 (deftest post-cryptocurrencies-test
   (testing "should create a cryptocurrency with success"
     (let [response (http-post "/api/cryptocurrencies" 

@@ -86,6 +86,16 @@
                           #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrencies cryptocurrencies\)"
                           (adapter/cryptocurrencies->response-body ["fake-crypto"])))))
 
+(deftest path-params->params-test
+  (testing "should adapt a pedestal path-param map in a internal param map"
+    (is (match? {:id id}
+                (adapter/path-params->params {:id (str id)}))))
+
+  (testing "shoud throw an exception when passed a path-params with unknown keywords"
+    (is (thrown-with-msg? java.lang.AssertionError
+                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.dto\/path-params path-params\)"
+                          (adapter/path-params->params {:x 1})))))
+
 (comment
   (clojure.spec.alpha/check-asserts true)
   (clojure.spec.alpha/assert :clojure-service.schema.cryptocurrency.model/cryptocurrencies [cryptocurrency]))

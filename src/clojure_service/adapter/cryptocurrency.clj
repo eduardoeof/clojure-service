@@ -78,3 +78,8 @@
    :post [(s/valid? ::schema.dto/get-response-body %)]}
   {:cryptocurrencies (map cryptocurrency->json cryptocurrencies)})
 
+(defn path-params->params
+  [{:keys [id] :as path-params}]
+  {:pre [(s/valid? ::schema.dto/path-params path-params)]}
+  {:id (java.util.UUID/fromString id)})
+

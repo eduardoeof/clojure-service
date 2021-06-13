@@ -22,10 +22,9 @@
      :body body}))
 
 (defn- get-cryptocurrency-by-id
-  [{{id :id} :path-params
-    components :components :as _request}]
-  ;; TODO: Adapter ->params
-  (let [body (-> {:id (java.util.UUID/fromString id)}
+  [{:keys [path-params components] :as _request}]
+  (let [body (-> path-params
+                 adapter/path-params->params 
                  (controller/get-cryptocurrencies components)
                  adapter/cryptocurrency->response-body)]
     {:status 200

@@ -124,5 +124,6 @@
       (let [response (http-get "/api/cryptocurrencies?type=XYZ" @components)]
 
         (testing "should get an empty collection"
-          (is (empty? (-> response :body json->edn))))))))
+          (is (match? {:cryptocurrencies empty?}
+                      (-> response :body json->edn))))))))
 

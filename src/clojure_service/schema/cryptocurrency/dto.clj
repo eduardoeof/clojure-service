@@ -46,4 +46,3 @@
 
 (s/def ::get-response-body (s/keys :req-un [::cryptocurrencies]))
 
-(s/def ::path-params (s/keys :req-un [::id]))

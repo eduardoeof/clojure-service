@@ -88,8 +88,7 @@
           response (http-get (str "/api/cryptocurrencies/" cryptocurrency-id) @components)]
       (is (match? {:status 200}
                   response))     
-      (is (match? {:cryptocurrency (merge {:id cryptocurrency-id}
-                                          cryptocurrency)}
+      (is (match? {:cryptocurrencies [(assoc cryptocurrency :id cryptocurrency-id)]}
                   (-> response :body json->edn))))))
 
 (deftest get-cryptocurrencies-internal-server-error-test

@@ -10,9 +10,11 @@
       (mongodb/insert! mongodb)))
 
 (defn ^:dynamic get-cryptocurrencies 
-  ([{:keys [mongodb] :as _components}]
-   (mongodb/find-maps mongodb))
-  ([{:keys [id] :as _params}
-    {:keys [mongodb] :as _components}]
-   (mongodb/find-by-id id mongodb)))
+  [{:keys [id type] :as _params} 
+   {:keys [mongodb] :as _components}]
+  (cond
+    id    (-> id 
+              (mongodb/find-by-id mongodb)
+              vector)
+    :else (mongodb/find-maps mongodb)))
 

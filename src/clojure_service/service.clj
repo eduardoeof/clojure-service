@@ -14,19 +14,10 @@
      :body body}))
 
 (defn- get-cryptocurrencies
-  [{:keys [components] :as _request}]
-  (let [body (->> components
-                  controller/get-cryptocurrencies
-                  adapter/cryptocurrencies->response-body)]
-    {:status 200
-     :body body}))
-
-(defn- get-cryptocurrency-by-id
-  [{:keys [path-params components] :as _request}]
-  (let [body (-> path-params
-                 adapter/path-params->params 
+  [{:keys [query-params path-params components] :as _request}]
+  (let [body (-> (adapter/query-and-path-params->params query-params path-params) 
                  (controller/get-cryptocurrencies components)
-                 adapter/cryptocurrency->response-body)]
+                 adapter/cryptocurrencies->response-body)]
     {:status 200
      :body body}))
 
@@ -46,7 +37,7 @@
                                    `get-cryptocurrencies]
                              :route-name :get-cryptocurrencies]
     
-    ["/api/cryptocurrencies/:id" :get [#_(interceptor/bad-response-interceptor ::schema/get-response-body)
-                                       `get-cryptocurrency-by-id]
+    ["/api/cryptocurrencies/:id" :get [(interceptor/bad-response-interceptor ::schema/get-response-body)
+                                       `get-cryptocurrencies]
                                  :route-name :get-cryptocurrency-by-id]})
 

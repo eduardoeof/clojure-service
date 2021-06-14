@@ -56,12 +56,6 @@
                  :last-updated       (-> BTC :last-updated time/local-date-time)
                  :volume-24h         (:volume-24h BTC)}}})
 
-(defn cryptocurrency->response-body 
-  [cryptocurrency]
-  {:pre  [(s/valid? ::schema.model/cryptocurrency cryptocurrency)]
-   :post [(s/valid? ::schema.dto/post-response-body %)]}
-  {:cryptocurrency (cryptocurrency->json cryptocurrency)})
-
 (defn mongodb-document->cryptocurrency 
   [{:keys [id name type slug created-at] {:keys [USD BTC]} :quote :as _document}]
   {:post [(s/valid? ::schema.model/cryptocurrency %)]}
@@ -82,14 +76,22 @@
                  :last-updated       (-> BTC :last-updated (time/local-date-time utc-zone-id))
                  :volume-24h         (:volume-24h BTC)}}})
 
+(defn cryptocurrency->response-body 
+  [cryptocurrency]
+  {:pre  [(s/valid? ::schema.model/cryptocurrency cryptocurrency)]
+   :post [(s/valid? ::schema.dto/post-response-body %)]}
+  {:cryptocurrency (cryptocurrency->json cryptocurrency)})
+
 (defn cryptocurrencies->response-body
   [cryptocurrencies]
   {:pre  [(s/valid? ::schema.model/cryptocurrencies cryptocurrencies)] 
    :post [(s/valid? ::schema.dto/get-response-body %)]}
   {:cryptocurrencies (map cryptocurrency->json cryptocurrencies)})
 
-(defn path-params->params
-  [{:keys [id] :as path-params}]
-  {:pre [(s/valid? ::schema.dto/path-params path-params)]}
-  {:id (java.util.UUID/fromString id)})
+(defn query-and-path-params->params
+  [{:keys [type] :as query-params}
+   {:keys [id] :as path-params}]
+  (-> {}
+      (assoc-if :id id #(java.util.UUID/fromString %))
+      (assoc-if :type type)))
 

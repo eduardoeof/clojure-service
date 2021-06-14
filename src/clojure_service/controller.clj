@@ -17,5 +17,5 @@
               (mongodb/find-by-id mongodb)
               vector)
     type  (mongodb/find-all-by-type type mongodb)
-    :else (mongodb/find-maps mongodb)))
+    :else (mongodb/find-all mongodb)))
 

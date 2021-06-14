@@ -11,7 +11,7 @@
       (monger/insert-and-return collection cryptocurrency)
       adapter/mongodb-document->cryptocurrency))
 
-(defn find-maps [{:keys [db] :as _mongodb}]
+(defn find-all [{:keys [db] :as _mongodb}]
   (->> collection
        (monger/find-maps db)
        (map adapter/mongodb-document->cryptocurrency)))

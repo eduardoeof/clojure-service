@@ -86,15 +86,28 @@
                           #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrencies cryptocurrencies\)"
                           (adapter/cryptocurrencies->response-body ["fake-crypto"])))))
 
-(deftest path-params->params-test
-  (testing "should adapt a pedestal path-param map in a internal param map"
-    (is (match? {:id id}
-                (adapter/path-params->params {:id (str id)}))))
+(deftest query-and-path-params->params-test
+  (testing "should adapt a query-params and a path-params to internal params"
+    (let [query-params {:type "BTC"}
+          path-params  {:id (str id)}]
+      (is (match? {:id id
+                   :type "BTC"}
+                  (adapter/query-and-path-params->params query-params path-params)))))
 
-  (testing "shoud throw an exception when passed a path-params with unknown keywords"
-    (is (thrown-with-msg? java.lang.AssertionError
-                          #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.dto\/path-params path-params\)"
-                          (adapter/path-params->params {:x 1})))))
+  (testing "should adapt a nil query-params and a path-params to internal params"
+    (let [query-params nil 
+          path-params  {:id (str id)}]
+      (is (match? {:id id}
+                  (adapter/query-and-path-params->params query-params path-params)))))
+
+  (testing "should adapt a query-params and a nil path-params to internal params"
+    (let [query-params {:type "BTC"} 
+          path-params  {}]
+      (is (match? {:type "BTC"}
+                  (adapter/query-and-path-params->params query-params path-params)))))
+
+  (testing "should create a empty map when query-params and path-params are nil"
+    (is (empty? (adapter/query-and-path-params->params nil {})))))
 
 (comment
   (clojure.spec.alpha/check-asserts true)

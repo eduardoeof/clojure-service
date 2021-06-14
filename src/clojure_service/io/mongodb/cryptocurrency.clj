@@ -22,3 +22,10 @@
   (->> {:id id}
        (monger/find-one-as-map db collection)
        adapter/mongodb-document->cryptocurrency))
+
+(defn find-all-by-type
+  [type
+   {:keys [db] :as _mongodb}]
+  (->> {:type type}
+       (monger/find-maps db collection)
+       (map adapter/mongodb-document->cryptocurrency)))

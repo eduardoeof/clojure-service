@@ -7,6 +7,16 @@
 (def utc-zone-id (time/zone-id "UTC"))
 (def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS")
 
+(defn- assoc-if
+  ([m key value]
+   (assoc-if m key value nil))
+  ([m key value f]
+   (if value
+     (assoc m key (if f 
+                    (f value) 
+                    value))
+     m)))
+
 (defn- cryptocurrency->json
   [{:keys [id name type slug created-at] 
           {:keys [USD BTC]} :quote :as cryptocurrency}]

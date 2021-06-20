@@ -9,3 +9,6 @@ up:
 
 health:
 		curl localhost:8080/api/health
+
+mongodb:
+	mongo --host localhost --port 27017

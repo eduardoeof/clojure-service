@@ -127,3 +127,11 @@
           (is (match? {:cryptocurrencies empty?}
                       (-> response :body json->edn))))))))
 
+(deftest get-cryptocurrencies-by-date-range
+ (testing "given three cryptocurrencies records with same type and from different datetime"
+   (testing "when the endpoint GET /api/cryptocurrencies is requested by type and a date range"
+     (testing "should repond only cryptocurrencies records in the date range"))
+
+   (testing "when the endpoint GET /api/cryptocurrencies is requested by a date range that doesn't have records"
+     (testing "should respond an empty collection"))))
+

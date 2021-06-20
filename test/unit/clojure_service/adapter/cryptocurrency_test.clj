@@ -5,11 +5,17 @@
             [clojure-service.adapter.cryptocurrency :as adapter]))
 
 (def id (java.util.UUID/randomUUID))
+(def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
 (def created-at-instant (time/instant))
-(def created-at (time/local-date-time created-at-instant (time/zone-id "UTC")))
-(def last-updated "2018-08-09T22:53:32.000")
-(def last-update-date-time (time/local-date-time last-updated))
-(def last-update-instant #inst "2018-08-09T22:53:32.000-00:00")
+(def created-at (time/zoned-date-time created-at-instant 
+                                      (time/zone-id "Z")))
+
+(def last-updated-instant (time/instant))
+(def last-updated (time/zoned-date-time last-updated-instant 
+                                        (time/zone-id "Z")))
+(def last-updated-str (time/format date-time-format 
+                                   last-updated)) 
 
 (def request-body {:name "Bitcoin"
                    :type "BTC"
@@ -18,29 +24,30 @@
                                   :percent-change-1h -0.152774
                                   :percent-change-24h 0.518894
                                   :percent-change-7d 0.986573
-                                  :last-updated last-updated}
+                                  :last-updated last-updated-str}
                            :BTC {:price 1.0 
                                  :volume-24h 772012
                                  :percent-change-1h 0.0 
                                  :percent-change-24h 0.0
                                  :percent-change-7d 0.0
-                                 :last-updated last-updated}}})
+                                 :last-updated last-updated-str}}})
 
 (def cryptocurrency-json (assoc request-body 
-                                :id (str id) 
-                                :created-at (time/format created-at)))
+                                :id         (str id) 
+                                :created-at (time/format date-time-format
+                                                         created-at)))
 
 (def cryptocurrency (-> request-body 
                         (assoc :id         id 
                                :created-at created-at)
-                        (assoc-in [:quote :USD :last-updated] last-update-date-time)
-                        (assoc-in [:quote :BTC :last-updated] last-update-date-time)))
+                        (assoc-in [:quote :USD :last-updated] last-updated)
+                        (assoc-in [:quote :BTC :last-updated] last-updated)))
 
 (def mongodb-document (-> cryptocurrency
                           (assoc :_id (java.util.UUID/randomUUID)
                                  :created-at created-at-instant)
-                          (assoc-in [:quote :USD :last-updated] last-update-instant)
-                          (assoc-in [:quote :BTC :last-updated] last-update-instant)))
+                          (assoc-in [:quote :USD :last-updated] last-updated-instant)
+                          (assoc-in [:quote :BTC :last-updated] last-updated-instant)))
 
 (def mongodb-document-fake (dissoc mongodb-document :name))
 
@@ -75,6 +82,18 @@
     (is (thrown-with-msg? java.lang.AssertionError
                           #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrency \%\)"
                           (adapter/mongodb-document->cryptocurrency mongodb-document-fake)))))
+
+(deftest cryptocurrency->mongodb-document-test
+  (testing "should adapt a cryptocurrency to a mongodb document"
+    (let [mongodb-document (dissoc mongodb-document :_id)]
+      (is (match? mongodb-document 
+                  (adapter/cryptocurrency->mongodb-document cryptocurrency))))) 
+  
+  (testing "should thrown an exception when returned a non cryptocurrency"
+    (let [fake-cryptocurrency {:x 1}]
+      (is (thrown-with-msg? java.lang.AssertionError
+                            #"Assert failed: \(s\/valid\? :clojure-service.schema.cryptocurrency.model\/cryptocurrency cryptocurrency\)"
+                            (adapter/cryptocurrency->mongodb-document fake-cryptocurrency))))))
 
 (deftest cryptocurrencies->response-body-test
   (testing "should adapt an vector of cryptocurrency in a response body"

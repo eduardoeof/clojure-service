@@ -4,8 +4,17 @@
             [clojure-service.schema.cryptocurrency.model :as schema.model]
             [clojure-service.schema.cryptocurrency.dto :as schema.dto]))
 
-(def utc-zone-id (time/zone-id "UTC"))
-(def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS")
+(def utc-zone-id (time/zone-id "Z"))
+(def date-time-format "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
+(defn- zoned-date-time->str [zoned-date-time]
+  (time/format date-time-format zoned-date-time))
+
+(defn- instant->zoned-date-time [instant]
+  (time/zoned-date-time instant utc-zone-id))
+
+(defn- zoned-date-time->instant [zoned-date-time]
+  (.toInstant zoned-date-time))
 
 (defn- assoc-if
   ([m key value]
@@ -24,17 +33,17 @@
    :name name
    :type type
    :slug slug
-   :created-at (time/format created-at)
+   :created-at (zoned-date-time->str created-at) 
    :quote {:USD {:price              (:price USD)
                  :percent-change-1h  (:percent-change-1h USD)
                  :percent-change-24h (:percent-change-24h USD)
                  :percent-change-7d  (:percent-change-7d USD)
-                 :last-updated       (->> USD :last-updated (time/format date-time-format))}
+                 :last-updated       (->> USD :last-updated zoned-date-time->str)}
            :BTC {:price              (:price BTC)
                  :percent-change-1h  (:percent-change-1h BTC)
                  :percent-change-24h (:percent-change-24h BTC)
                  :percent-change-7d  (:percent-change-7d BTC)
-                 :last-updated       (->> BTC :last-updated (time/format date-time-format))
+                 :last-updated       (->> BTC :last-updated zoned-date-time->str)
                  :volume-24h         (:volume-24h BTC)}}})
 
 (defn request-body->cryptocurrency 
@@ -48,12 +57,12 @@
                  :percent-change-1h  (:percent-change-1h USD)
                  :percent-change-24h (:percent-change-24h USD)
                  :percent-change-7d  (:percent-change-7d USD)
-                 :last-updated       (-> USD :last-updated time/local-date-time)}
+                 :last-updated       (-> USD :last-updated time/zoned-date-time)}
            :BTC {:price              (:price BTC)
                  :percent-change-1h  (:percent-change-1h BTC)
                  :percent-change-24h (:percent-change-24h BTC)
                  :percent-change-7d  (:percent-change-7d BTC)
-                 :last-updated       (-> BTC :last-updated time/local-date-time)
+                 :last-updated       (-> BTC :last-updated time/zoned-date-time)
                  :volume-24h         (:volume-24h BTC)}}})
 
 (defn mongodb-document->cryptocurrency 
@@ -63,17 +72,37 @@
    :name name
    :type type
    :slug slug
-   :created-at (time/local-date-time created-at utc-zone-id)
+   :created-at (instant->zoned-date-time created-at)
    :quote {:USD {:price              (:price USD)
                  :percent-change-1h  (:percent-change-1h USD)
                  :percent-change-24h (:percent-change-24h USD)
                  :percent-change-7d  (:percent-change-7d USD)
-                 :last-updated       (-> USD :last-updated (time/local-date-time utc-zone-id))}
+                 :last-updated       (-> USD :last-updated instant->zoned-date-time)}
            :BTC {:price              (:price BTC)
                  :percent-change-1h  (:percent-change-1h BTC)
                  :percent-change-24h (:percent-change-24h BTC)
                  :percent-change-7d  (:percent-change-7d BTC)
-                 :last-updated       (-> BTC :last-updated (time/local-date-time utc-zone-id))
+                 :last-updated       (-> BTC :last-updated instant->zoned-date-time)
+                 :volume-24h         (:volume-24h BTC)}}})
+
+(defn cryptocurrency->mongodb-document 
+  [{:keys [id name type slug created-at] {:keys [USD BTC]} :quote :as cryptocurrency}]
+  {:pre [(s/valid? ::schema.model/cryptocurrency cryptocurrency)]}
+  {:id id 
+   :name name
+   :type type
+   :slug slug
+   :created-at (zoned-date-time->instant created-at)
+   :quote {:USD {:price              (:price USD)
+                 :percent-change-1h  (:percent-change-1h USD)
+                 :percent-change-24h (:percent-change-24h USD)
+                 :percent-change-7d  (:percent-change-7d USD)
+                 :last-updated       (-> USD :last-updated zoned-date-time->instant)}
+           :BTC {:price              (:price BTC)
+                 :percent-change-1h  (:percent-change-1h BTC)
+                 :percent-change-24h (:percent-change-24h BTC)
+                 :percent-change-7d  (:percent-change-7d BTC)
+                 :last-updated       (-> BTC :last-updated zoned-date-time->instant)
                  :volume-24h         (:volume-24h BTC)}}})
 
 (defn cryptocurrency->response-body 

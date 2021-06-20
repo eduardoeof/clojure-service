@@ -21,9 +21,9 @@
                         :percent-change-7d 0.0
                         :last-updated (time/local-date-time)}}})
 
-(def cryptocurrency (merge dto 
-                           {:id uuid?
-                            :created-at time/local-date-time?}))
+(def cryptocurrency (assoc dto 
+                           :id uuid?
+                           :created-at time/zoned-date-time?))
 
 (deftest create-cryptocurrency-test
   (testing "should create a cryptocurrency from a dto"

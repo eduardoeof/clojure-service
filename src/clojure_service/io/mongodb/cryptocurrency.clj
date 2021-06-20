@@ -7,9 +7,10 @@
 (defn insert! 
   [cryptocurrency 
    {:keys [db] :as _mongodb}]
-  (-> db
-      (monger/insert-and-return collection cryptocurrency)
-      adapter/mongodb-document->cryptocurrency))
+  (->> cryptocurrency 
+       adapter/cryptocurrency->mongodb-document
+       (monger/insert-and-return db collection)
+       adapter/mongodb-document->cryptocurrency))
 
 (defn find-all [{:keys [db] :as _mongodb}]
   (->> collection
@@ -29,3 +30,5 @@
   (->> {:type type}
        (monger/find-maps db collection)
        (map adapter/mongodb-document->cryptocurrency)))
+
+

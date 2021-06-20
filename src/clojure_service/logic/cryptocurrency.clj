@@ -4,5 +4,5 @@
 (defn create-cryptocurrency [cryptocurrency]
   (assoc cryptocurrency 
          :id (java.util.UUID/randomUUID)
-         :created-at (time/local-date-time)))
+         :created-at (time/zoned-date-time)))
 

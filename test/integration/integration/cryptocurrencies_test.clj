@@ -27,12 +27,12 @@
                                  :percent-change-1h -0.152774
                                  :percent-change-24h 0.518894
                                  :percent-change-7d 0.986573
-                                 :last-updated "2018-08-09T22:53:32.000"}
+                                 :last-updated "2018-08-09T22:53:32.000Z"}
                            :BTC {:price 1.0 
                                  :percent-change-1h 0.0 
                                  :percent-change-24h 0.0
                                  :percent-change-7d 0.0
-                                 :last-updated "2018-08-09T22:53:32.000"
+                                 :last-updated "2018-08-09T22:53:32.000Z"
                                  :volume-24h 772012}}})
 
 (def cryptocurrency (assoc request-body

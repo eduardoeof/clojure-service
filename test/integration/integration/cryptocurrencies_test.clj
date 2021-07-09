@@ -40,67 +40,82 @@
                            :created-at string?))
 
 (deftest post-cryptocurrencies-test
-  (testing "should create a cryptocurrency with success"
+  (testing "when the POST /api/crytocurrencies endpoint is requested with a cryptocurrency"
     (let [response (http-post "/api/cryptocurrencies" 
                               (edn->json request-body)
                               @components)]
-      (is (match? {:status 201}
-                  response))  
-      (is (match? {:cryptocurrency cryptocurrency} 
-                  (-> response :body json->edn)))))
+
+      (testing "then it should return 201 and the cryptocurrency created"
+        (is (match? {:status 201}
+                    response))  
+        (is (match? {:cryptocurrency cryptocurrency} 
+                    (-> response :body json->edn))))))
   
-  (testing "should responde bad request error when tried to create a cryptocurrency"
+  (testing "when the POST /api/crytocurrencies endpoint is requested with a cryptocurrency without all required attributes"
     (let [body (dissoc request-body :name)
           response (http-post "/api/cryptocurrencies" 
                               (edn->json body)
                               @components)]
-      (is (match? {:status 400
-                   :body (edn->json {:message "Request not valid"})}
-                  response))))
+
+      (testing "then it should return 400 (bad request) and a message"
+        (is (match? {:status 400
+                     :body (edn->json {:message "Request not valid"})}
+                    response)))))
   
-  (testing "should responde internal server error when response doesn't match to a cryptocurrency"
+  (testing "when the POST /api/crytocurrencies endpoint is requested but the service tries to return a non valid cryptocurrency"
     (binding [controller/create-cryptocurrency (fn [_] {})]
       (let [response (http-post "/api/cryptocurrencies" 
                                 (edn->json request-body)
                                 @components)]
-        (is (match? {:status 500
-                     :body (edn->json {:message "Internal server error"})}
-                    response))))))
+
+        (testing "then it should return 500 (internal server error) because response doesn't follow the expected response schema"
+          (is (match? {:status 500
+                       :body (edn->json {:message "Internal server error"})}
+                      response)))))))
 
 (deftest get-cryptocurrencies-test
-  (testing "should get all saved cryptocurrencies"
+  (testing "given a cryptocurrency previews created"
     (http-post "/api/cryptocurrencies" (edn->json request-body) @components)
 
-    (let [response (http-get "/api/cryptocurrencies" @components)]
-      (is (match? {:status 200}
-                  response))
+    (testing "when the endpoint GET /api/cryptocurrencies is requested"
+      (let [response (http-get "/api/cryptocurrencies" @components)]
 
-      (is (match? {:cryptocurrencies [cryptocurrency]}
-                  (-> response :body json->edn))))))
+        (testing "then it should return 200 and all storaged cryptocurrencies"
+          (is (match? {:status 200}
+                      response))
+
+          (is (match? {:cryptocurrencies [cryptocurrency]}
+                      (-> response :body json->edn))))))))
 
 (deftest get-cryptocurrencies-by-id-test
-  (testing "should get a cryptocurrency by id"
-    (let [cryptocurrency-id (-> (http-post "/api/cryptocurrencies" (edn->json request-body) @components)
+  (testing "given a cryptocurrency previews created")
+    (let [cryptocurrency (-> (http-post "/api/cryptocurrencies" (edn->json request-body) @components)
                                 :body
                                 json->edn
-                                :cryptocurrency
-                                :id)
-          response (http-get (str "/api/cryptocurrencies/" cryptocurrency-id) @components)]
-      (is (match? {:status 200}
-                  response))     
-      (is (match? {:cryptocurrencies [(assoc cryptocurrency :id cryptocurrency-id)]}
-                  (-> response :body json->edn))))))
+                                :cryptocurrency)]
+
+      (testing "when the endpoint GET /api/cryptocurrencies is requested with a cryptocurrency id"
+        (let [response (http-get (str "/api/cryptocurrencies/" (:id cryptocurrency)) @components)]
+  
+          (testing "it should return 200 and the cryptocurrency of the passed id"
+            (is (match? {:status 200}
+                        response))     
+
+            (is (match? {:cryptocurrencies [(assoc cryptocurrency :id (:id cryptocurrency))]}
+                        (-> response :body json->edn))))))))
 
 (deftest get-cryptocurrencies-internal-server-error-test
-  (testing "should response internal server error when response doesn't match to a vector of cryptocurrency"
+  (testing "when the GET /api/crytocurrencies endpoint is requested but the service tries to return a not expected response"
     (binding [controller/get-cryptocurrencies (fn [_] ["fake value"])]
       (let [response (http-get "/api/cryptocurrencies" @components)]
-        (is (match? {:status 500
-                     :body (edn->json {:message "Internal server error"})}
-                    response))))))
+
+        (testing "then it should return 500 and a error message"
+          (is (match? {:status 500
+                       :body (edn->json {:message "Internal server error"})}
+                      response)))))))
 
 (deftest get-cryptocurrencies-by-type-test
-  (testing "given two different types of cryptocurrency (BTC and ETH)"
+  (testing "given two different types of cryptocurrency (BTC and ETH) previews created"
     (let [bitcoin  (edn->json request-body)
           ethereum (-> request-body
                        (assoc :name "Ethereum" 
@@ -114,7 +129,7 @@
     (testing "when the endpoint GET /api/cryptocurrencies is requested by type BTC"
       (let [response (http-get "/api/cryptocurrencies?type=BTC" @components)]
 
-        (testing "should only get the historic of BTC cryptocurrency"
+        (testing "then it should only get the historic of BTC cryptocurrency"
           (is (match? {:status 200}
                       response)) 
           (is (match? {:cryptocurrencies [{:type "BTC"}]}
@@ -123,15 +138,15 @@
     (testing "when the endpoint GET /api/cryptocurrencies is requested by an unknown type"
       (let [response (http-get "/api/cryptocurrencies?type=XYZ" @components)]
 
-        (testing "should get an empty collection"
+        (testing "then it should get an empty collection"
           (is (match? {:cryptocurrencies empty?}
                       (-> response :body json->edn))))))))
 
 (deftest get-cryptocurrencies-by-date-range
- (testing "given three cryptocurrencies records with same type and from different datetime"
-   (testing "when the endpoint GET /api/cryptocurrencies is requested by type and a date range"
-     (testing "should repond only cryptocurrencies records in the date range"))
+  (testing "given three cryptocurrencies records with same type and from different datetime"
+    (testing "when the endpoint GET /api/cryptocurrencies is requested by type and a date range"
+      (testing "then it should respond only cryptocurrencies records in the date range"))
 
-   (testing "when the endpoint GET /api/cryptocurrencies is requested by a date range that doesn't have records"
-     (testing "should respond an empty collection"))))
+    (testing "when the endpoint GET /api/cryptocurrencies is requested by a date range that doesn't have records"
+      (testing "then it should respond an empty collection"))))
 

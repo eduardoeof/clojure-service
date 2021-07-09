@@ -14,7 +14,10 @@
 (use-fixtures :once fixtures-once)
 
 (deftest health-test
-  (let [response (http-get "/api/health" @components)]
-    (is (match? {:status 200
-                 :body (edn->json {:message "I have a dream - Martin Luther King, Jr."})} 
-                response))))
+  (testing "when GET /api/health endpoint is requested"
+    (let [response (http-get "/api/health" @components)]
+
+      (testing "then it should return 200 and a message"
+        (is (match? {:status 200
+                     :body (edn->json {:message "I have a dream - Martin Luther King, Jr."})} 
+                    response))))))

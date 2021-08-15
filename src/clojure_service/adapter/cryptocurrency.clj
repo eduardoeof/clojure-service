@@ -118,9 +118,11 @@
   {:cryptocurrencies (map cryptocurrency->json cryptocurrencies)})
 
 (defn query-and-path-params->params
-  [{:keys [type] :as query-params}
+  [{:keys [type from to] :as query-params}
    {:keys [id] :as path-params}]
   (-> {}
       (assoc-if :id id #(java.util.UUID/fromString %))
-      (assoc-if :type type)))
+      (assoc-if :type type)
+      (assoc-if :from from time/zoned-date-time)
+      (assoc-if :to to time/zoned-date-time)))
 

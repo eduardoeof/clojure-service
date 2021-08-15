@@ -106,27 +106,32 @@
                           (adapter/cryptocurrencies->response-body ["fake-crypto"])))))
 
 (deftest query-and-path-params->params-test
-  (testing "should adapt a query-params and a path-params to internal params"
-    (let [query-params {:type "BTC"}
-          path-params  {:id (str id)}]
-      (is (match? {:id id
-                   :type "BTC"}
-                  (adapter/query-and-path-params->params query-params path-params)))))
+  (let [from-date    "2021-07-30T01:13:00.000Z"
+        to-date      "2021-07-30T05:13:00.000Z"
+        query-params {:type "BTC"
+                      :from from-date 
+                      :to   to-date}
+        path-params  {:id (str id)}]
 
-  (testing "should adapt a nil query-params and a path-params to internal params"
-    (let [query-params nil 
-          path-params  {:id (str id)}]
+    (testing "should adapt a query-params and a path-params to internal params"
+      (is (match? {:id   id
+                   :type "BTC"
+                   :from (time/zoned-date-time from-date)  
+                   :to   (time/zoned-date-time to-date)}
+                  (adapter/query-and-path-params->params query-params path-params))))
+
+    (testing "should adapt a nil query-params and a path-params to internal params"
       (is (match? {:id id}
-                  (adapter/query-and-path-params->params query-params path-params)))))
+                  (adapter/query-and-path-params->params nil path-params))))
 
-  (testing "should adapt a query-params and a nil path-params to internal params"
-    (let [query-params {:type "BTC"} 
-          path-params  {}]
-      (is (match? {:type "BTC"}
-                  (adapter/query-and-path-params->params query-params path-params)))))
+    (testing "should adapt a query-params and a nil path-params to internal params"
+      (is (match? {:type "BTC"
+                   :from (time/zoned-date-time from-date)  
+                   :to   (time/zoned-date-time to-date)}
+                  (adapter/query-and-path-params->params query-params nil))))
 
-  (testing "should create a empty map when query-params and path-params are nil"
-    (is (empty? (adapter/query-and-path-params->params nil {})))))
+    (testing "should create a empty map when query-params and path-params are nil"
+      (is (empty? (adapter/query-and-path-params->params nil nil))))))
 
 (comment
   (clojure.spec.alpha/check-asserts true)

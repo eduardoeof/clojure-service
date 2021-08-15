@@ -20,6 +20,25 @@
 (use-fixtures :once fixtures-once)
 (use-fixtures :each fixtures-each)
 
+(defn gen-request-body 
+  ([]
+   (gen-request-body {}))
+  ([{:keys [last-updated] :as _params}]
+   {:name "Bitcoin"
+    :type "BTC"
+    :slug "bitcoin"
+    :quote {:USD {:price 9283.92
+                  :percent-change-1h -0.152774
+                  :percent-change-24h 0.518894
+                  :percent-change-7d 0.986573
+                  :last-updated (or last-updated "2018-08-09T22:53:32.000Z")}
+            :BTC {:price 1.0 
+                  :percent-change-1h 0.0 
+                  :percent-change-24h 0.0
+                  :percent-change-7d 0.0
+                  :last-updated (or last-updated "2018-08-09T22:53:32.000Z")
+                  :volume-24h 772012}}}))
+
 (def request-body {:name "Bitcoin"
                    :type "BTC"
                    :slug "bitcoin"
@@ -39,6 +58,7 @@
                            :id string?
                            :created-at string?))
 
+;; TODO: Use gen-request-body
 (deftest post-cryptocurrencies-test
   (testing "when the POST /api/crytocurrencies endpoint is requested with a cryptocurrency"
     (let [response (http-post "/api/cryptocurrencies" 
@@ -144,9 +164,39 @@
 
 (deftest get-cryptocurrencies-by-date-range
   (testing "given three cryptocurrencies records with same type and from different datetime"
-    (testing "when the endpoint GET /api/cryptocurrencies is requested by type and a date range"
-      (testing "then it should respond only cryptocurrencies records in the date range"))
+    (let [bitcoin-1 (gen-request-body "2018-08-09T00:00:00.000Z")
+          bitcoin-2 (gen-request-body "2018-08-09T02:00:00.000Z")
+          bitcoin-3 (gen-request-body "2018-08-09T04:00:00.000Z")]
+
+      (http-post "/api/cryptocurrencies" (edn->json bitcoin-1) @components)
+      (http-post "/api/cryptocurrencies" (edn->json bitcoin-2) @components)
+      (http-post "/api/cryptocurrencies" (edn->json bitcoin-3) @components)
+
+      (testing "when the endpoint GET /api/cryptocurrencies is requested by type and a date range"
+        (let [response (http-get (str "/api/cryptocurrencies?" 
+                                      "from=2018-08-09T01:00:00.000Z&" 
+                                      "to=2018-08-09T05:00:00.000Z")
+                                 @components)]
+
+          (testing "then it should respond only cryptocurrencies records in the date range"
+            (is (match? {:status 200}
+                        response)) 
+            (is (match? {:cryptocurrencies [(assoc bitcoin-2
+                                                   :id string?
+                                                   :created-at string?)
+                                            (assoc bitcoin-3
+                                                   :id string?
+                                                   :created-at string?)]}
+                        (-> response :body json->edn)))))))
 
     (testing "when the endpoint GET /api/cryptocurrencies is requested by a date range that doesn't have records"
-      (testing "then it should respond an empty collection"))))
+      (let [response (http-get (str "/api/cryptocurrencies?" 
+                                      "from=2018-08-09T10:00:00.000Z&" 
+                                      "to=2018-08-09T10:55:00.000Z")
+                                 @components)]
+
+      (testing "then it should respond an empty collection"
+        (is (match? {:status 404
+                     :body (edn->json {:message "No cryptocurrency found"})}
+                    response)))))))
 
